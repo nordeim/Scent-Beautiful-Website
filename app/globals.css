@@ -1,0 +1,25 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:root {
+  --background: #F5F2ED;
+  --foreground: #2C2C2C;
+}
+
+[data-theme='night'] {
+  --background: #1A1A1A;
+  --foreground: #F5F5F5;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans, Inter, Arial, sans-serif);
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Utility for smooth theme transitions */
+html, body {
+  transition: background 0.3s, color 0.3s;
+}

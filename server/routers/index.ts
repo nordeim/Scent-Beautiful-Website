@@ -1,0 +1,14 @@
+import { productRouter } from './product'
+import { cartRouter } from './cart'
+import { orderRouter } from './order'
+import { userRouter } from './user'
+import { router } from '../trpc'
+
+export const appRouter = router({
+  product: productRouter,
+  cart: cartRouter,
+  order: orderRouter,
+  user: userRouter,
+})
+
+export type AppRouter = typeof appRouter
