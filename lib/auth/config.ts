@@ -1,3 +1,4 @@
+import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
@@ -11,9 +12,10 @@ const credentialsSchema = z.object({
   password: z.string().min(8),
 })
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    // Note: In a real app, ensure these environment variables are set.
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -31,19 +33,40 @@ export const authOptions = {
       async authorize(credentials) {
         const parsed = credentialsSchema.safeParse(credentials)
         if (!parsed.success) return null
+
         const user = await prisma.user.findUnique({ where: { email: parsed.data.email } })
-        if (!user || !user.password) return null
-        const valid = await compare(parsed.data.password, user.password)
-        if (!valid) return null
-        return user
+        if (!user || !user.passwordHash) return null
+
+        const isValid = await compare(parsed.data.password, user.passwordHash)
+        if (!isValid) return null
+
+        return {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        }
       },
     }),
   ],
   session: { strategy: 'jwt' },
-  pages: { signIn: '/login' },
+  pages: {
+    signIn: '/login',
+    // Add other pages as they are built
+    // error: '/auth/error',
+  },
   callbacks: {
-    session: async ({ session, user }) => {
-      if (user) session.user = user
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.role = user.role
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string
+        session.user.role = token.role as string
+      }
       return session
     },
   },

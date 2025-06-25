@@ -1,11 +1,7 @@
-"use client"
-import React, { createContext, useContext } from "react"
+'use client'
 
-// Stub for future Auth context
-const AuthContext = createContext(undefined)
+import { SessionProvider } from 'next-auth/react'
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  return <AuthContext.Provider value={undefined}>{children}</AuthContext.Provider>
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  return <SessionProvider>{children}</SessionProvider>
 }
-
-export const useAuth = () => useContext(AuthContext)

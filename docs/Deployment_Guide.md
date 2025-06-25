@@ -168,7 +168,7 @@ The project targets Node.js 20+. Check the `.nvmrc` or `package.json` for the pr
 **Recommended: Use NodeSource APT repo for Node.js 20.x**
 
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt install -y nodejs
 node -v
 npm -v
@@ -179,8 +179,8 @@ Alternatively, use [nvm](https://github.com/nvm-sh/nvm):
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 source ~/.bashrc
-nvm install 20
-nvm use 20
+nvm install 22
+nvm use 22
 node -v
 ```
 
@@ -263,7 +263,7 @@ Start the container:
 
 ```bash
 cd ~/scent-db
-docker compose up -d
+docker compose -f docker-compose.yml up -d
 ```
 
 **Check status:**
