@@ -31,11 +31,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn('min-h-screen bg-background font-sans antialiased', inter.variable)}>
+      <body
+        className={cn(
+          'min-h-screen bg-limestone font-sans antialiased dark:bg-midnight',
+          inter.variable,
+        )}
+      >
         <TrpcProvider>
           <AuthProvider>
             <ThemeProvider>
-              <div className="relative flex min-h-dvh flex-col bg-background">
+              <div className="relative flex min-h-dvh flex-col">
                 <Header />
                 <main className="flex-1">{children}</main>
                 <Footer />
