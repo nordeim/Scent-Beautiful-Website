@@ -1,25 +1,78 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+/* app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #F5F2ED;
-  --foreground: #2C2C2C;
+@layer base {
+  :root {
+    /* Day Theme Variables */
+    --background: 14 50% 97%; /* limestone: #F5F2ED */
+    --foreground: 0 0% 17%; /* charcoal: #2C2C2C */
+
+    --card: 14 50% 97%;
+    --card-foreground: 0 0% 17%;
+
+    --popover: 14 50% 97%;
+    --popover-foreground: 0 0% 17%;
+
+    --primary: 125 13% 42%; /* sage: #7B9B7E */
+    --primary-foreground: 0 0% 98%; /* A light text for sage */
+
+    --secondary: 125 13% 95%; /* A very light sage for secondary backgrounds */
+    --secondary-foreground: 125 13% 30%;
+
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 257 57% 92%; /* lavender: #E6E0F5 */
+    --accent-foreground: 257 20% 30%;
+
+    --destructive: 12 60% 63%; /* terracotta: #D4846F */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 125 13% 42%; /* sage */
+
+    --radius: 0.5rem;
+  }
+
+  [data-theme='night'] {
+    /* Night Theme Variables */
+    --background: 0 0% 10%; /* midnight: #1A1A1A */
+    --foreground: 0 0% 98%; /* pearl: #F5F5F5 */
+
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 125 13% 33%; /* deep-sage: #4A5F4C */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 63%;
+
+    --accent: 257 15% 33%; /* deep-lavender: #4A4565 */
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 4 33% 41%; /* burgundy: #8B4A47 */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 125 13% 33%; /* deep-sage */
+  }
 }
 
-[data-theme='night'] {
-  --background: #1A1A1A;
-  --foreground: #F5F5F5;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans, Inter, Arial, sans-serif);
-  transition: background 0.3s, color 0.3s;
-}
-
-/* Utility for smooth theme transitions */
-html, body {
-  transition: background 0.3s, color 0.3s;
+@layer base {
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-inter, sans-serif);
+  }
 }

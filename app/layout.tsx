@@ -1,8 +1,13 @@
+// app/layout.tsx
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { AuthProvider } from '@/components/providers/AuthProvider'
+import { Header } from '@/components/common/Layout/Header'
+import { Footer } from '@/components/common/Layout/Footer'
+import { cn } from '@/lib/utils'
+import { TrpcProvider } from '@/components/providers/TrpcProvider'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,10 +31,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
-        <AuthProvider>
-          <ThemeProvider>{children}</ThemeProvider>
-        </AuthProvider>
+      <body className={cn('min-h-screen bg-background font-sans antialiased', inter.variable)}>
+        <TrpcProvider>
+          <AuthProvider>
+            <ThemeProvider>
+              <div className="relative flex min-h-dvh flex-col bg-background">
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </div>
+            </ThemeProvider>
+          </AuthProvider>
+        </TrpcProvider>
       </body>
     </html>
   )

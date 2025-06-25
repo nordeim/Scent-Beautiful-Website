@@ -4,9 +4,9 @@ mkdir ttt4
 vi ttt4/oo1
 cd ttt4 ; pwd
 
-egrep '^```|^# File:|^# app\/' oo1
+egrep '^```|^# File:|^# app\/|^\/\/ ' oo1
 
-egrep '^```|^# File:|^# app\/' ttt4/oo1
+egrep '^```|^# File:|^# app\/|^\/\/ ' ttt4/oo1
 
 python3 ../extract_code_files.py oo1
 
@@ -14,11 +14,9 @@ python3 extract_code_files.py  oo1
 
 find app -type f
 
-rsync -av app /cdrom/project/SG-Point-Of-Sale/
+rsync -av app components lib tests /cdrom/project/Scent-Beautiful-Website/
 
 cd .. ; pwd ; rm -rf ttt4
-
-poetry run sg_bookkeeper
 
 $ :%s/^# app\//# File: app\//  
 

@@ -56,27 +56,35 @@ def ensure_directory_exists(file_path):
 
 def extract_files(input_file_path, encoding):
     """
-    Extract files strictly from blocks like:
+    Extract files from bundled code blocks with formats like:
+
+    ```tsx
+    // app/page.tsx
+    import { Button } from '@/components/common/Button'
+    import Link from 'next/link'
+    ... // other lines 
+    ```
+
+    or for Python:
+
     ```python
     # File: path/to/file.py
     <file contents>
     ```
-    or
-    ```py
-    # File: path/to/file.py
-    <file contents>
-    ```
-    and the extracted file includes the marker line as its first line.
+    
+    This script supports various file types including .js, .ts, and .tsx.
+    The first line within the code fence should be a marker comment with the file path.
+    It accepts either a "# File:" marker or a "//" style marker.
     """
     blocks_found = 0
     successful_extractions = 0
     rejected_blocks = []
     overwrites = []
 
-    # Accept both ```python and ```py
-    # python_fence_pattern = re.compile(r"^```(?:python|py|js|php)\s*$")
-    python_fence_pattern = re.compile(r"^```(?:python|py|ts|tsx|json|prisma|js|sql)\s*$")
-    file_marker_pattern = re.compile(r"^#\s*File:\s*(.+)$")
+    # Accept code fence markers for various languages.
+    code_fence_pattern = re.compile(r"^```(?:python|py|ts|tsx|js|jsx|json|prisma|css|sql)\s*$")
+    # Support marker lines that start with "# File:" or with "//"
+    file_marker_pattern = re.compile(r"^(?:#\s*File:\s*|//\s*)(.+)$")
     closing_fence_pattern = re.compile(r"^```\s*$")
     created_files = set()
 
@@ -88,24 +96,24 @@ def extract_files(input_file_path, encoding):
         n = len(lines)
         while i < n:
             line = lines[i].rstrip('\r\n')
-            # Look for opening python or py code fence
-            if python_fence_pattern.match(line):
+            # Look for an opening code fence that matches one of the allowed languages.
+            if code_fence_pattern.match(line):
                 blocks_found += 1
-                # Must have at least one more line for file marker
+                # Must have at least one more line for the file marker
                 if i+1 >= n:
-                    rejected_blocks.append(("<unknown>", "Missing file marker after ```python/py"))
+                    rejected_blocks.append(("<unknown>", "Missing file marker after code fence"))
                     i += 1
                     continue
                 marker_line = lines[i+1].rstrip('\r\n')
                 marker_match = file_marker_pattern.match(marker_line)
                 if not marker_match:
-                    rejected_blocks.append(("<unknown>", "Expected '# File: filename' after ```python/py"))
+                    rejected_blocks.append(("<unknown>", "Expected a file marker comment after code fence"))
                     i += 1
                     continue
                 filename = normalize_path(marker_match.group(1))
-                content_lines = [marker_line]  # INCLUDE the marker line as the first line
+                content_lines = [marker_line]  # Include the marker line as the first line of the file
 
-                # Collect content lines: from i+2 up to the next closing ```
+                # Collect content lines until the closing fence is encountered.
                 j = i+2
                 found_closing = False
                 while j < n:
@@ -116,12 +124,11 @@ def extract_files(input_file_path, encoding):
                     content_lines.append(next_line)
                     j += 1
                 if not found_closing:
-                    rejected_blocks.append((filename, "Missing closing ``` for code block"))
+                    rejected_blocks.append((filename, "Missing closing code fence"))
                     i = j
                     continue
-                # Write file
                 if not filename:
-                    rejected_blocks.append(("<unknown>", "Empty filename"))
+                    rejected_blocks.append(("<unknown>", "Empty filename in file marker"))
                     i = j + 1
                     continue
                 if ensure_directory_exists(filename):
@@ -130,6 +137,7 @@ def extract_files(input_file_path, encoding):
                         print(f"  Warning: Overwriting file: {filename}")
                     try:
                         with open(filename, 'w', encoding='utf-8') as output_file:
+                            # Optionally remove trailing blank lines
                             while content_lines and content_lines[-1] == '':
                                 content_lines.pop()
                             output_file.write('\n'.join(content_lines) + '\n')
@@ -142,7 +150,7 @@ def extract_files(input_file_path, encoding):
                         rejected_blocks.append((filename, error_msg))
                 else:
                     rejected_blocks.append((filename, "Failed to create directory"))
-                # Advance i to after the closing fence
+                # Advance i to after the closing fence.
                 i = j + 1
             else:
                 i += 1
@@ -154,11 +162,11 @@ def extract_files(input_file_path, encoding):
         sys.exit(1)
 
 def main():
-    # Get input file path
+    # Get input file path.
     input_file_path = get_input_arguments()
     print(f"Processing compacted file: {input_file_path}")
 
-    # Validate input file
+    # Validate input file.
     is_valid, result = is_readable_text_file(input_file_path)
     if not is_valid:
         print(f"Error: {result}")
@@ -166,12 +174,12 @@ def main():
     encoding = result
     print(f"Input file encoding detected as: {encoding}")
 
-    # Extract files
+    # Extract files.
     blocks_found, successful_extractions, rejected_blocks, overwrites = extract_files(input_file_path, encoding)
 
-    # Print summary statistics
+    # Print summary statistics.
     print("\nExtraction complete!")
-    print(f"Total strictly matched code blocks found: {blocks_found}")
+    print(f"Total code blocks found: {blocks_found}")
     print(f"Files successfully extracted: {successful_extractions}")
 
     if rejected_blocks:
@@ -182,8 +190,8 @@ def main():
 
     if overwrites:
         print(f"\nFiles overwritten: {len(overwrites)}")
-        print("Note: Multiple code blocks with the same filename were found.")
-        print("Each file contains the content from the last matching block.")
+        print("Note: Multiple code blocks with the same filename were found; each file contains the content from the last matching block.")
 
 if __name__ == "__main__":
     main()
+
