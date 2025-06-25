@@ -75,7 +75,7 @@ def extract_files(input_file_path, encoding):
 
     # Accept both ```python and ```py
     # python_fence_pattern = re.compile(r"^```(?:python|py|js|php)\s*$")
-    python_fence_pattern = re.compile(r"^```(?:python|py|sql)\s*$")
+    python_fence_pattern = re.compile(r"^```(?:python|py|ts|tsx|json|prisma|js|sql)\s*$")
     file_marker_pattern = re.compile(r"^#\s*File:\s*(.+)$")
     closing_fence_pattern = re.compile(r"^```\s*$")
     created_files = set()
