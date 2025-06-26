@@ -1,3 +1,4 @@
+// server/routers/product.ts
 import { z } from 'zod'
 import { router, publicProcedure, protectedProcedure } from '../trpc'
 import { TRPCError } from '@trpc/server'
@@ -7,7 +8,7 @@ export const productRouter = router({
     .input(
       z.object({
         limit: z.number().min(1).max(100).default(12),
-        cursor: z.string().nullish(), // For cursor-based pagination
+        cursor: z.string().nullish(),
         category: z.string().optional(),
         sortBy: z.enum(['price', 'createdAt']).default('createdAt'),
         sortOrder: z.enum(['asc', 'desc']).default('desc'),
@@ -26,9 +27,7 @@ export const productRouter = router({
         },
         include: {
           variants: {
-            orderBy: {
-              price: 'asc',
-            },
+            orderBy: { price: 'asc' },
             take: 1,
           },
           images: {
@@ -83,6 +82,29 @@ export const productRouter = router({
       return product
     }),
 
+  getRelated: publicProcedure
+    .input(z.object({
+      categoryId: z.string(),
+      currentProductId: z.string(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const products = await ctx.prisma.product.findMany({
+        take: 4,
+        where: {
+          isActive: true,
+          categoryId: input.categoryId,
+          id: {
+            not: input.currentProductId, // Exclude the current product
+          },
+        },
+        include: {
+          variants: { orderBy: { price: 'asc' }, take: 1 },
+          images: { where: { isPrimary: true }, take: 1 },
+        },
+      });
+      return products;
+    }),
+
   create: protectedProcedure
     .input(
       z.object({
@@ -92,7 +114,6 @@ export const productRouter = router({
         description: z.string().optional(),
         price: z.number(),
         categoryId: z.string().uuid(),
-        // ... more fields
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -100,9 +121,7 @@ export const productRouter = router({
       if (role !== 'admin' && role !== 'staff') {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
-
-      // In a real implementation, you would create the product and its first variant
-      // in a transaction. This is a simplified example.
+      
       const product = await ctx.prisma.product.create({
         data: {
           name: input.name,

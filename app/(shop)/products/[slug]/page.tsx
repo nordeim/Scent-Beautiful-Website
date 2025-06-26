@@ -6,9 +6,8 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ProductInfo } from '@/components/features/product/ProductInfo'
 import { api } from '@/lib/api/trpc'
-
-// Note: We cannot generate dynamic metadata in a Client Component.
-// This would need to be handled in a parent layout if dynamic SEO is critical.
+import { RelatedProducts } from '@/components/features/product/RelatedProducts'
+import { Product3DViewer } from '@/components/features/product/Product3DViewer'
 
 export default function ProductPage() {
   const params = useParams()
@@ -16,42 +15,49 @@ export default function ProductPage() {
 
   const { data: product, isLoading, error } = api.product.bySlug.useQuery(
     { slug },
-    { enabled: !!slug }, // Only run query if slug is available
+    { enabled: !!slug },
   )
 
   if (isLoading) {
-    return <div className="container my-12 text-center">Loading...</div>
+    return <div className="container my-12 text-center">Loading Product...</div>
   }
 
   if (error || !product) {
-    // If the query returns a NOT_FOUND error, use Next.js's notFound utility
     notFound()
   }
 
   return (
     <div className="container my-12">
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
-        {/* Image Gallery Section */}
-        <motion.div
-          layoutId={`product-image-${product.id}`}
-          className="relative aspect-square"
-        >
-          {product.images?.[0]?.url && (
-            <Image
-              src={product.images[0].url}
-              alt={product.name}
-              fill
-              className="object-cover rounded-lg"
-              priority
-            />
+        {/* Image / 3D Viewer Section */}
+        <div className="relative aspect-square">
+          {product.modelUrl ? (
+            <Product3DViewer modelUrl={product.modelUrl} />
+          ) : (
+            <motion.div layoutId={`product-image-${product.id}`} className="relative h-full w-full">
+              {product.images?.[0]?.url && (
+                <Image
+                  src={product.images[0].url}
+                  alt={product.name}
+                  fill
+                  className="object-cover rounded-lg"
+                  priority
+                />
+              )}
+            </motion.div>
           )}
-        </motion.div>
+        </div>
 
         {/* Product Information Section */}
         <div>
           <ProductInfo product={product} />
         </div>
       </div>
+      
+      <RelatedProducts
+        categoryId={product.categoryId}
+        currentProductId={product.id}
+      />
     </div>
   )
 }

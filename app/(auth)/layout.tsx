@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
           <div className="absolute inset-0 bg-stone-900" />
           <Image
-            src="https://images.unsplash.com/photo-1558223531-a74b5a034a69?q=80&w=1935&auto=format&fit=crop"
+            src="/images/auth-background.jpg"
             alt="Aesthetic arrangement of aromatherapy bottles and natural elements"
             fill
             className="object-cover opacity-30"

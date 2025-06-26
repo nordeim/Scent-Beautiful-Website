@@ -116,6 +116,7 @@ model Product {
   scentNotes        Json             @default("{}")
   ingredients       String[]
   usageInstructions String?
+  modelUrl          String? // New field for the 3D model path
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
   categoryId        String
