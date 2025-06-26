@@ -5,66 +5,72 @@
 
 @layer base {
   :root {
-    /* Day Theme Colors */
-    --background: 240 17% 96%; /* #f5f2ed - limestone */
-    --foreground: 240 5% 17%;  /* #2c2c2c - charcoal */
+    /* Day Theme - Graphite Light - HSL Values */
+    --background: 0 0% 96.1%;      /* stone-100 */
+    --foreground: 20 14.3% 15.1%;  /* stone-800 */
     
-    --card: 240 17% 96%;
-    --card-foreground: 240 5% 17%;
+    --card: 0 0% 96.1%;
+    --card-foreground: 20 14.3% 15.1%;
     
-    --primary: 125 13% 55%;        /* #7b9b7e - sage */
-    --primary-foreground: 0 0% 98%; /* #f5f5f5 - pearl */
-
-    --secondary: 125 13% 33%;      /* #4a5f4c - deep-sage */
+    --primary: 158 83% 34%;      /* sage-600 */
+    --primary-foreground: 158 83% 97.1%; /* sage-50 */
+    
+    --secondary: 20 14.3% 15.1%;
     --secondary-foreground: 0 0% 98%;
 
-    --destructive: 13 54% 63%;     /* #d4846f - terracotta */
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --muted: 240 5% 63%;
-    --muted-foreground: 240 5% 40%;
+    --muted: 20 5.9% 55.1%;
+    --muted-foreground: 20 5.9% 55.1%;
     
-    --accent: 125 13% 55%;
+    --accent: 158 83% 44%;
     --accent-foreground: 0 0% 98%;
     
-    --border: 240 6% 87%;
-    --input: 240 6% 87%;
-    --ring: 125 13% 55%;
+    --border: 0 0% 89.8%;          /* stone-200 */
+    --input: 0 0% 89.8%;
+    --ring: 158 83% 34%;
     
     --radius: 0.5rem;
   }
 
   [data-theme='night'] {
-    /* Night Theme Colors */
-    --background: 0 0% 10%;       /* #1a1a1a - midnight */
-    --foreground: 0 0% 98%;       /* #f5f5f5 - pearl */
+    /* Night Theme - Graphite Dark - HSL Values */
+    --background: 20 14.3% 3.5%;  /* stone-950 */
+    --foreground: 0 0% 89.8%;      /* stone-200 */
+    
+    --card: 20 14.3% 3.5%;
+    --card-foreground: 0 0% 89.8%;
+    
+    --primary: 158 83% 44%;      /* sage-500 */
+    --primary-foreground: 158 83% 97.1%;
+    
+    --secondary: 0 0% 89.8%;
+    --secondary-foreground: 20 14.3% 3.5%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 98%;
-
-    --primary: 125 13% 45%;        /* A slightly brighter deep-sage for night mode */
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 125 13% 25%;
-    --secondary-foreground: 0 0% 98%;
-
-    --destructive: 6 56% 50%;      /* #8b4a47 - burgundy */
+    --destructive: 0 72.2% 50.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 63%;
+    --muted: 0 0% 63.9%;
+    --muted-foreground: 0 0% 63.9%;
     
-    --accent: 125 13% 45%;
+    --accent: 158 83% 44%;
     --accent-foreground: 0 0% 98%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 125 13% 45%;
+    --border: 20 14.3% 15.1%;      /* stone-800 */
+    --input: 20 14.3% 15.1%;
+    --ring: 158 83% 44%;
   }
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
   }
 }
