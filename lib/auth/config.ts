@@ -1,3 +1,4 @@
+// lib/auth/config.ts
 import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import GoogleProvider from 'next-auth/providers/google'
@@ -5,17 +6,11 @@ import EmailProvider from 'next-auth/providers/email'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/db/client'
 import { compare } from 'bcryptjs'
-import { z } from 'zod'
-
-const credentialsSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-})
+import { loginSchema } from '@/lib/validation/schemas'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
-    // Note: In a real app, ensure these environment variables are set.
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -31,7 +26,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        const parsed = credentialsSchema.safeParse(credentials)
+        const parsed = loginSchema.safeParse(credentials)
         if (!parsed.success) return null
 
         const user = await prisma.user.findUnique({ where: { email: parsed.data.email } })
@@ -44,6 +39,8 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           role: user.role,
+          name: user.firstName,
+          image: user.avatarUrl,
         }
       },
     }),
@@ -51,8 +48,7 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
   pages: {
     signIn: '/login',
-    // Add other pages as they are built
-    // error: '/auth/error',
+    error: '/login', // Redirect to login page on error
   },
   callbacks: {
     async jwt({ token, user }) {

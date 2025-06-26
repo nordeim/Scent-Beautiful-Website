@@ -5,10 +5,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/common/Button'
 import { cn } from '@/lib/utils'
 import { serverApi } from '@/lib/api/trpc'
+import { useCart } from '@/hooks/use-cart'
 
-// Infer the precise type from the tRPC procedure output for end-to-end type safety.
 type ProductListOutput = Awaited<ReturnType<typeof serverApi.product.list.query>>
-type ProductCardType = ProductListOutput['items'][number]
+export type ProductCardType = ProductListOutput['items'][number]
 
 interface ProductCardProps {
   product: ProductCardType
@@ -16,17 +16,38 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
+  const { addItem, setDrawerOpen } = useCart()
   const primaryImage = product.images?.[0]
   const primaryVariant = product.variants?.[0]
+  const displayPrice = primaryVariant?.price ?? product.price
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    // In a future step, this will call a "useCart" hook.
-    console.log(`Adding ${product.name} to cart.`)
-  }
+    if (!primaryVariant) {
+      // Handle case where product might not have variants properly
+      console.error('No variant found for product:', product.name)
+      return
+    }
 
-  // Use the price from the first variant if available, otherwise fallback to the product's base price.
-  const displayPrice = primaryVariant?.price ?? product.price
+    addItem({
+      id: primaryVariant.id,
+      product: {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+      },
+      variant: {
+        id: primaryVariant.id,
+        name: primaryVariant.name,
+        price: displayPrice,
+      },
+      image: {
+        url: primaryImage?.url || '/placeholder.jpg',
+        altText: primaryImage?.altText,
+      },
+    })
+    setDrawerOpen(true)
+  }
 
   return (
     <Link href={`/products/${product.slug}`} className="group">
@@ -44,9 +65,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
         </CardHeader>
         <CardContent className="p-4">
           <CardTitle className="text-lg font-medium truncate">{product.name}</CardTitle>
-          <p className="mt-2 text-xl font-semibold">
-            ${displayPrice.toString()}
-          </p>
+          <p className="mt-2 text-xl font-semibold">${displayPrice.toString()}</p>
         </CardContent>
         <CardFooter className="p-4 pt-0">
           <Button variant="secondary" className="w-full" onClick={handleAddToCart}>
