@@ -1,14 +1,13 @@
 // components/features/product/ProductCard.tsx
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/common/Card'
 import { Button } from '@/components/common/Button'
 import { cn } from '@/lib/utils'
-import { serverApi } from '@/lib/api/trpc'
 import { useCart } from '@/hooks/use-cart'
-
-type ProductListOutput = Awaited<ReturnType<typeof serverApi.product.list.query>>
-export type ProductCardType = ProductListOutput['items'][number]
+import type { ProductCardType } from '@/types'
 
 interface ProductCardProps {
   product: ProductCardType
@@ -24,7 +23,6 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     if (!primaryVariant) {
-      // Handle case where product might not have variants properly
       console.error('No variant found for product:', product.name)
       return
     }

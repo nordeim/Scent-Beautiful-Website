@@ -1,7 +1,7 @@
 // prisma/schema.prisma
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = [] // "jsonProtocol" removed as it's now stable
+  previewFeatures = []
 }
 
 datasource db {
@@ -33,6 +33,7 @@ enum DiscountType {
 model User {
   id                String             @id @default(uuid())
   email             String             @unique
+  name              String?
   emailVerified     DateTime?
   passwordHash      String?
   role              UserRole           @default(customer)
@@ -224,41 +225,39 @@ model Address {
   updatedAt     DateTime @updatedAt
   userId        String
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  shippingOrders Order[] @relation("ShippingAddress")
-  billingOrders  Order[] @relation("BillingAddress")
 }
 
 model Order {
-  id                String      @id @default(uuid())
-  orderNumber       String      @unique
-  status            OrderStatus @default(pending)
-  total             Decimal     @db.Decimal(10, 2)
-  notes             String?
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-  userId            String
-  user              User        @relation(fields: [userId], references: [id], onDelete: NoAction)
-  shippingAddressId String
-  shippingAddress   Address     @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
-  billingAddressId  String
-  billingAddress    Address     @relation("BillingAddress", fields: [billingAddressId], references: [id])
-  items             OrderItem[]
-  appliedCoupons    Json?
-
-  @@index([userId])
+  id                    String      @id @default(uuid())
+  orderNumber           String      @unique
+  status                OrderStatus @default(pending)
+  total                 Decimal     @db.Decimal(10, 2)
+  notes                 String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  userId                String?
+  user                  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  shippingAddress       Json?
+  billingAddress        Json?
+  items                 OrderItem[]
+  stripePaymentIntentId String?     @unique
+  paymentStatus         String      @default("pending")
 }
 
 model OrderItem {
-  id        String         @id @default(uuid())
-  quantity  Int
-  price     Decimal        @db.Decimal(10, 2)
-  orderId   String
-  order     Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: NoAction)
-  productId String
-  product   Product        @relation(fields: [productId], references: [id], onDelete: NoAction)
+  id           String         @id @default(uuid())
+  quantity     Int
+  price        Decimal        @db.Decimal(10, 2) // Price per item at time of purchase
+  orderId      String
+  order        Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId    String
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: NoAction)
+  productId    String
+  product      Product        @relation(fields: [productId], references: [id], onDelete: NoAction)
+  // Denormalized data for historical accuracy
+  productName  String
+  variantName  String
+  productImage String?
 }
 
 model Coupon {
