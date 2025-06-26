@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { AuthProvider } from '@/components/providers/AuthProvider'
@@ -12,6 +12,12 @@ import { TrpcProvider } from '@/components/providers/TrpcProvider'
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+})
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  variable: '--font-cormorant',
 })
 
 export const metadata: Metadata = {
@@ -33,14 +39,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          'min-h-screen bg-limestone font-sans antialiased dark:bg-midnight',
+          'min-h-screen font-sans antialiased bg-limestone text-charcoal dark:bg-midnight dark:text-pearl',
           inter.variable,
+          cormorant.variable,
         )}
       >
         <TrpcProvider>
           <AuthProvider>
             <ThemeProvider>
-              <div className="relative flex min-h-dvh flex-col">
+              <div className="relative flex min-h-dvh flex-col bg-limestone dark:bg-midnight">
                 <Header />
                 <main className="flex-1">{children}</main>
                 <Footer />

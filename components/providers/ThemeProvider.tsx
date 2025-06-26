@@ -1,41 +1,21 @@
+// components/providers/ThemeProvider.tsx
 "use client"
-import React, { createContext, useContext, useEffect, useState } from "react"
+import { useEffect } from "react"
+import { useUIStore } from "@/store/ui.store"
 
-type Theme = "day" | "night"
-
-interface ThemeContextType {
-  theme: Theme
-  setTheme: (theme: Theme) => void
-  toggleTheme: () => void
-}
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
-
+/**
+ * This component is responsible for applying the current theme to the DOM.
+ * It listens to the global Zustand store for theme changes and updates the
+ * `data-theme` attribute on the `<html>` element accordingly.
+ * It does not provide a context, as the state is managed globally by Zustand.
+ */
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("theme") as Theme) || "day"
-    }
-    return "day"
-  })
+  const theme = useUIStore((state) => state.theme)
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme)
-    localStorage.setItem("theme", theme)
+    // The 'persist' middleware in the Zustand store handles saving to localStorage.
   }, [theme])
 
-  const setTheme = (t: Theme) => setThemeState(t)
-  const toggleTheme = () => setThemeState((prev) => (prev === "day" ? "night" : "day"))
-
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
-}
-
-export const useTheme = () => {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider")
-  return ctx
+  return <>{children}</>
 }

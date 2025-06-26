@@ -4,9 +4,9 @@ mkdir ttt4
 vi ttt4/oo1
 cd ttt4 ; pwd
 
-egrep '^```|^# File:|^# app\/|^\/\/ ' oo1
+egrep -n '^```|^# File:|^# app\/|^\/\/ ' oo1
 
-egrep '^```|^# File:|^# app\/|^\/\/ ' ttt4/oo1
+egrep -n '^```|^# File:|^# app\/|^\/\/ ' ttt4/oo1
 
 python3 ../extract_code_files.py oo1
 

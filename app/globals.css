@@ -2,3 +2,69 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Day Theme Colors */
+    --background: 240 17% 96%; /* #f5f2ed - limestone */
+    --foreground: 240 5% 17%;  /* #2c2c2c - charcoal */
+    
+    --card: 240 17% 96%;
+    --card-foreground: 240 5% 17%;
+    
+    --primary: 125 13% 55%;        /* #7b9b7e - sage */
+    --primary-foreground: 0 0% 98%; /* #f5f5f5 - pearl */
+
+    --secondary: 125 13% 33%;      /* #4a5f4c - deep-sage */
+    --secondary-foreground: 0 0% 98%;
+
+    --destructive: 13 54% 63%;     /* #d4846f - terracotta */
+    --destructive-foreground: 0 0% 98%;
+
+    --muted: 240 5% 63%;
+    --muted-foreground: 240 5% 40%;
+    
+    --accent: 125 13% 55%;
+    --accent-foreground: 0 0% 98%;
+    
+    --border: 240 6% 87%;
+    --input: 240 6% 87%;
+    --ring: 125 13% 55%;
+    
+    --radius: 0.5rem;
+  }
+
+  [data-theme='night'] {
+    /* Night Theme Colors */
+    --background: 0 0% 10%;       /* #1a1a1a - midnight */
+    --foreground: 0 0% 98%;       /* #f5f5f5 - pearl */
+
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
+
+    --primary: 125 13% 45%;        /* A slightly brighter deep-sage for night mode */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 125 13% 25%;
+    --secondary-foreground: 0 0% 98%;
+
+    --destructive: 6 56% 50%;      /* #8b4a47 - burgundy */
+    --destructive-foreground: 0 0% 98%;
+
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 63%;
+    
+    --accent: 125 13% 45%;
+    --accent-foreground: 0 0% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 125 13% 45%;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}

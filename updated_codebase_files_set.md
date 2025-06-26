@@ -1,3 +1,5 @@
+# components/common/Layout/Footer.tsx
+```tsx
 // components/common/Layout/Footer.tsx
 import Link from 'next/link';
 import { Button } from '@/components/common/Button';
@@ -123,3 +125,160 @@ export function Footer() {
     </footer>
   );
 }
+
+```
+
+# package.json
+```json
+{
+  "name": "the-scent",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:e2e": "playwright test",
+    "prisma:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/client": "^6.10.1",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@sendgrid/mail": "^8.1.3",
+    "@tanstack/react-query": "^5.50.1",
+    "@trpc/client": "11.0.0-rc.446",
+    "@trpc/next": "11.0.0-rc.446",
+    "@trpc/react-query": "11.0.0-rc.446",
+    "@trpc/server": "11.0.0-rc.446",
+    "algoliasearch": "^4.24.0",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.19.1",
+    "lucide-react": "^0.523.0",
+    "next": "^14.2.30",
+    "next-auth": "^4.24.7",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "stripe": "^16.2.0",
+    "superjson": "^2.2.1",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^3.23.8",
+    "zustand": "^4.5.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.1",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.21",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "postcss": "^8.5.6",
+    "prisma": "^6.10.1",
+    "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  }
+}
+
+```
+
+# postcss.config.mjs
+```mjs
+// postcss.config.mjs
+/** @type {import('postcss-load-config').Config} */
+const config = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+
+export default config;
+
+```
+
+# tailwind.config.ts
+```ts
+import type { Config } from 'tailwindcss';
+import { fontFamily } from 'tailwindcss/defaultTheme';
+
+const config: Config = {
+  darkMode: ['class', "[data-theme='night']"],
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+    './lib/**/*.{js,ts,jsx,tsx}',
+  ],
+  theme: {
+    container: {
+      center: true,
+      padding: '2rem',
+      screens: {
+        '2xl': '1400px',
+      },
+    },
+    extend: {
+      colors: {
+        // Custom brand colors
+        sage: '#7B9B7E',
+        'deep-sage': '#4A5F4C',
+        limestone: '#F5F2ED',
+        midnight: '#1A1A1A',
+        charcoal: '#2C2C2C',
+        pearl: '#F5F5F5',
+        terracotta: '#D4846F',
+        // ShadCN/UI style theme colors using CSS variables
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+      },
+      fontFamily: {
+        sans: ['var(--font-inter)', ...fontFamily.sans],
+        heading: ['Cormorant Garamond', 'serif'],
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
+
+```
+

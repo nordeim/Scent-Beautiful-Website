@@ -26,8 +26,8 @@
 **The Scent** is a new standard in luxury e-commerce, blending modern design, advanced personalization, and immersive product discovery. This platform is meticulously crafted to transform the intangible essence of scent into a digital experience—emotionally engaging, visually stunning, and technically robust.
 
 Built on the latest web technologies, The Scent features:
-- **Next.js 14+** with App Router & React Server Components
-- **Tailwind CSS** with a custom design system for day/night luxury themes
+- **Next.js 15** with App Router & React Server Components
+- **Tailwind CSS 4** with a custom design system for day/night luxury themes
 - **Type-Safe, Modular Backend** with tRPC, Prisma (Postgres), and seamless third-party integrations (Stripe, SendGrid, Algolia, S3)
 - **Modern DevOps** with monorepo, CI/CD, and comprehensive test coverage
 
@@ -88,7 +88,7 @@ Below is a high-level interaction diagram:
 ```
 
 **Key Notes:**
-- **Frontend:** React 18+, Next.js 14+ App Router, Tailwind CSS, Framer Motion, Three.js
+- **Frontend:** React 19, Next.js 15 App Router, Tailwind 4, Framer Motion, Three.js
 - **Backend:** Next.js API routes & tRPC (strict TypeScript), Prisma/Postgres, Auth.js
 - **Infrastructure:** Vercel (serverless/edge), Cloudflare CDN, Cloudinary (images), AWS S3
 - **Integrations:** Stripe (payments), SendGrid (email), Algolia (search), Sanity (CMS)
@@ -119,7 +119,7 @@ the-scent/
 ├── lib/                # Utilities, integrations, backend logic
 │   ├── api/            # API clients
 │   ├── auth/           # Auth.js config, RBAC, helpers
-│   ├── db/             # Prisma client
+│   ├── db/             # Prisma client, migrations
 │   ├── email/          # SendGrid integration
 │   ├── payments/       # Stripe integration
 │   ├── search/         # Algolia integration
@@ -130,6 +130,7 @@ the-scent/
 ├── public/             # Static assets (fonts, images, icons, manifest)
 ├── server/             # tRPC routers, backend context
 ├── store/              # Zustand global state stores
+├── styles/             # SCSS/CSS modules and design tokens
 ├── tests/              # Unit, integration, and e2e test suites
 ├── types/              # TypeScript type definitions
 ├── .github/            # Workflows (CI/CD), issue templates
@@ -146,16 +147,16 @@ the-scent/
 ## Technology Stack
 
 **Frontend**
-- [Next.js 14+](https://nextjs.org/) (App Router, Server Components)
-- [React 18+](https://react.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
+- [Next.js 15](https://nextjs.org/) (App Router, Server Components)
+- [React 19](https://react.dev/)
+- [Tailwind CSS 4](https://tailwindcss.com/)
 - [Framer Motion](https://www.framer.com/motion/) (animation)
 - [Three.js](https://threejs.org/) (3D product views)
 - [Zustand](https://zustand-demo.pmnd.rs/) (state management)
 
 **Backend & API**
 - [tRPC](https://trpc.io/) (type-safe API)
-- [Prisma](https://www.prisma.io/) ORM ([PostgreSQL](https://www.postgresql.org/))
+- [Prisma](https://www.prisma.io/) ORM ([PostgreSQL 16](https://www.postgresql.org/))
 - [Auth.js (NextAuth)](https://authjs.dev/) (authentication, social & email)
 - [Stripe](https://stripe.com/) (payments)
 - [SendGrid](https://sendgrid.com/) (email)
@@ -167,7 +168,7 @@ the-scent/
 - [Vercel](https://vercel.com/) (hosting, edge, CDN)
 - [Cloudflare](https://www.cloudflare.com/) (global CDN)
 - [GitHub Actions](https://github.com/features/actions) (CI/CD)
-- [ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [Husky](https://typicode.github.io/husky/)
+- [ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [Husky](https://typicode.github.io/husky/), [Commitizen](https://commitizen-tools.github.io/commitizen/)
 - [Jest](https://jestjs.io/), [React Testing Library](https://testing-library.com/), [Playwright](https://playwright.dev/) (testing)
 - [Sentry](https://sentry.io/), [Vercel Analytics](https://vercel.com/analytics) (monitoring)
 - [TypeScript 5+](https://www.typescriptlang.org/) (strict mode, end-to-end)
@@ -180,7 +181,8 @@ the-scent/
 
 - [Node.js 20+](https://nodejs.org/)
 - [pnpm 8+](https://pnpm.io/) (used as package manager)
-- [PostgreSQL](https://www.postgresql.org/)
+- [PostgreSQL 16+](https://www.postgresql.org/)
+- [Vercel CLI](https://vercel.com/docs/cli) *(optional: for full stack/edge emulation)*
 - (Optional) [Docker](https://www.docker.com/) for local database
 
 ### 1. Clone the Repository
@@ -198,50 +200,45 @@ pnpm install
 
 ### 3. Configure Environment Variables
 
-- Copy `.env.example` to `.env`:
+- Copy `.env.example` to `.env.local`:
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
 - Fill in values for:
   - `DATABASE_URL` (Postgres connection string)
   - `STRIPE_SECRET_KEY`, `SENDGRID_API_KEY`, etc.
   - Social login keys (Google, etc.)
+  - See the [Execution Plan](docs/Execution_Plan.md#phase-2-core-domain-models--database) for details.
 
 ### 4. Set Up the Database
 
-You can use local Postgres or Docker.
+You can use local Postgres or Docker:
 
 <details>
-<summary>Postgres via Docker (Recommended)</summary>
+<summary>Postgres via Docker</summary>
 
-Run this command to start a PostgreSQL container configured to match the `.env` file:
 ```bash
-docker run --name scent-postgres \
-  -e POSTGRES_USER=scent_user \
-  -e POSTGRES_PASSWORD=StrongPass1234 \
-  -e POSTGRES_DB=scent_db \
-  -p 5432:5432 \
-  -d postgres:16
+docker run --name scent-postgres -e POSTGRES_PASSWORD=dev -p 5432:5432 -d postgres:16
 ```
-Your `DATABASE_URL` in `.env` should already match this setup.
+
+Set your `.env.local`:
+
+```
+DATABASE_URL=postgresql://postgres:dev@localhost:5432/postgres
+```
 </details>
 
-- Apply migrations to set up the schema:
+- Run migrations & seed data:
 
 ```bash
 pnpm prisma migrate deploy
-```
-
-- (Optional) Seed the database with sample data:
-```bash
-pnpm prisma:seed
+pnpm prisma db seed
 ```
 
 ### 5. Generate the Prisma Client
 
-This is usually done automatically by `pnpm install`, but you can run it manually if needed:
 ```bash
 pnpm prisma generate
 ```
@@ -264,10 +261,17 @@ pnpm dev
   ```bash
   pnpm test:e2e
   ```
-- **Linting:**
+- **Linting & Formatting:**
   ```bash
   pnpm lint
+  pnpm format
   ```
+
+### 8. Optional: Vercel CLI for Full Stack/Edge
+
+```bash
+vercel dev
+```
 
 ---
 
@@ -293,7 +297,7 @@ We welcome contributions from the open source community and luxury e-commerce en
    - Tailwind CSS best practices  
    - [Conventional Commits](https://www.conventionalcommits.org/)
 4. **Test your changes** locally and with `pnpm test`.
-5. **Lint** your code: `pnpm lint`.
+5. **Lint & format** your code: `pnpm lint && pnpm format`.
 6. **Open a Pull Request** describing your changes.
 
 Please read the [Execution Plan](docs/Execution_Plan.md) to understand the project’s structure and development flow.

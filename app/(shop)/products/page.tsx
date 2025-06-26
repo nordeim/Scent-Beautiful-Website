@@ -22,11 +22,11 @@ export default async function ProductsPage() {
       </section>
 
       {productListData.items.length === 0 ? (
-        <p className="text-center">No products found.</p>
+        <p className="text-center text-muted-foreground">No products found. Please check back soon!</p>
       ) : (
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8">
           {productListData.items.map((product) => (
-            <ProductCard key={product.id} product={product as any} />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}
