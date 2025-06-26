@@ -1,41 +1,30 @@
 // app/(shop)/products/[slug]/page.tsx
-import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
+'use client'
+
+import { useParams, notFound } from 'next/navigation'
 import Image from 'next/image'
+import { motion } from 'framer-motion'
 import { ProductInfo } from '@/components/features/product/ProductInfo'
-import { appRouter } from '@/server/routers'
-import { createContext } from '@/server/context'
+import { api } from '@/lib/api/trpc'
 
-interface ProductPageProps {
-  params: {
-    slug: string
-  }
-}
+// Note: We cannot generate dynamic metadata in a Client Component.
+// This would need to be handled in a parent layout if dynamic SEO is critical.
 
-// Generate dynamic metadata for SEO
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const serverContext = await createContext()
-  const caller = appRouter.createCaller(serverContext)
-  const product = await caller.product.bySlug({ slug: params.slug })
+export default function ProductPage() {
+  const params = useParams()
+  const slug = typeof params.slug === 'string' ? params.slug : ''
 
-  if (!product) {
-    return {
-      title: 'Product Not Found',
-    }
+  const { data: product, isLoading, error } = api.product.bySlug.useQuery(
+    { slug },
+    { enabled: !!slug }, // Only run query if slug is available
+  )
+
+  if (isLoading) {
+    return <div className="container my-12 text-center">Loading...</div>
   }
 
-  return {
-    title: product.name,
-    description: product.shortDescription || product.description,
-  }
-}
-
-export default async function ProductPage({ params }: ProductPageProps) {
-  const serverContext = await createContext()
-  const caller = appRouter.createCaller(serverContext)
-  const product = await caller.product.bySlug({ slug: params.slug })
-
-  if (!product) {
+  if (error || !product) {
+    // If the query returns a NOT_FOUND error, use Next.js's notFound utility
     notFound()
   }
 
@@ -43,7 +32,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <div className="container my-12">
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
         {/* Image Gallery Section */}
-        <div className="relative aspect-square">
+        <motion.div
+          layoutId={`product-image-${product.id}`}
+          className="relative aspect-square"
+        >
           {product.images?.[0]?.url && (
             <Image
               src={product.images[0].url}
@@ -53,7 +45,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               priority
             />
           )}
-        </div>
+        </motion.div>
 
         {/* Product Information Section */}
         <div>

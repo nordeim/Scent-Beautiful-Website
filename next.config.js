@@ -7,7 +7,7 @@ const nextConfig = {
   // and does not need to be explicitly set.
 
   // As per the project architecture, we will need to load images
-  // from external domains like Cloudinary. This configuration block
+  // from external domains like Cloudinary and Unsplash. This configuration block
   // prepares our application for that.
   images: {
     remotePatterns: [
@@ -18,7 +18,11 @@ const nextConfig = {
         // port: '',
         // pathname: '/your-cloudinary-account/**',
       },
-      // Add other image provider domains here as needed
+      // New pattern added to whitelist images from Unsplash
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
   },
 };

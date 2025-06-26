@@ -2,12 +2,10 @@
 import type { Metadata } from 'next'
 import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
-import { ThemeProvider } from '@/components/providers/ThemeProvider'
-import { AuthProvider } from '@/components/providers/AuthProvider'
 import { Header } from '@/components/common/Layout/Header'
 import { Footer } from '@/components/common/Layout/Footer'
 import { cn } from '@/lib/utils'
-import { TrpcProvider } from '@/components/providers/TrpcProvider'
+import { Providers } from '@/components/providers/Providers'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -39,22 +37,18 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          'min-h-screen font-sans antialiased bg-limestone text-charcoal dark:bg-midnight dark:text-pearl',
+          'min-h-screen bg-background font-sans text-foreground antialiased',
           inter.variable,
           cormorant.variable,
         )}
       >
-        <TrpcProvider>
-          <AuthProvider>
-            <ThemeProvider>
-              <div className="relative flex min-h-dvh flex-col bg-limestone dark:bg-midnight">
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </div>
-            </ThemeProvider>
-          </AuthProvider>
-        </TrpcProvider>
+        <Providers>
+          <div className="relative flex min-h-dvh flex-col bg-background">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   )

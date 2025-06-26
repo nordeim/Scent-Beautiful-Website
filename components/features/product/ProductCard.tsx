@@ -3,6 +3,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { motion } from 'framer-motion'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/common/Card'
 import { Button } from '@/components/common/Button'
 import { cn } from '@/lib/utils'
@@ -51,7 +52,10 @@ export function ProductCard({ product, className }: ProductCardProps) {
     <Link href={`/products/${product.slug}`} className="group">
       <Card className={cn('overflow-hidden transition-shadow duration-300 hover:shadow-xl', className)}>
         <CardHeader className="p-0">
-          <div className="relative aspect-square overflow-hidden">
+          <motion.div
+            layoutId={`product-image-${product.id}`}
+            className="relative aspect-square overflow-hidden"
+          >
             <Image
               src={primaryImage?.url || '/placeholder.jpg'}
               alt={primaryImage?.altText || product.name}
@@ -59,7 +63,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
               className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
-          </div>
+          </motion.div>
         </CardHeader>
         <CardContent className="p-4">
           <CardTitle className="text-lg font-medium truncate">{product.name}</CardTitle>
