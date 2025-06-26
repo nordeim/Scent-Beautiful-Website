@@ -1,6 +1,10 @@
 // next.config.js
 // @ts-check
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -9,7 +13,6 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
       },
-      // The 'images.unsplash.com' pattern is now removed as it is no longer used.
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
@@ -18,4 +21,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig)

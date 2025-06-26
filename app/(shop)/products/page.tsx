@@ -8,14 +8,15 @@ export const metadata = {
   description: 'Explore our full collection of premium, natural aromatherapy products.',
 }
 
+// Revalidate this page every hour (3600 seconds)
+export const revalidate = 3600;
+
 export default async function ProductsPage() {
   const serverContext = await createContext()
   const caller = appRouter.createCaller(serverContext)
 
   const productListData = await caller.product.list({ limit: 12 })
 
-  // Transform non-serializable data (Decimal) into serializable data (number)
-  // before passing it to the Client Component.
   const serializableProducts = productListData.items.map((product) => ({
     ...product,
     price: product.price.toNumber(),

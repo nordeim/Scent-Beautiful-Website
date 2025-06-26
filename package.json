@@ -50,6 +50,7 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.3.4",
     "@playwright/test": "^1.45.1",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
