@@ -1,9 +1,10 @@
 // app/(shop)/products/[slug]/page.tsx
-import { serverApi } from '@/lib/api/trpc'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { ProductInfo } from '@/components/features/product/ProductInfo'
+import { appRouter } from '@/server/routers'
+import { createContext } from '@/server/context'
 
 interface ProductPageProps {
   params: {
@@ -13,7 +14,9 @@ interface ProductPageProps {
 
 // Generate dynamic metadata for SEO
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const product = await serverApi.product.bySlug.query({ slug: params.slug })
+  const serverContext = await createContext()
+  const caller = appRouter.createCaller(serverContext)
+  const product = await caller.product.bySlug({ slug: params.slug })
 
   if (!product) {
     return {
@@ -28,7 +31,9 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const product = await serverApi.product.bySlug.query({ slug: params.slug })
+  const serverContext = await createContext()
+  const caller = appRouter.createCaller(serverContext)
+  const product = await caller.product.bySlug({ slug: params.slug })
 
   if (!product) {
     notFound()

@@ -1,6 +1,7 @@
 // app/(shop)/products/page.tsx
-import { serverApi } from '@/lib/api/trpc'
 import { ProductCard } from '@/components/features/product/ProductCard'
+import { appRouter } from '@/server/routers'
+import { createContext } from '@/server/context'
 
 export const metadata = {
   title: 'All Products',
@@ -8,8 +9,12 @@ export const metadata = {
 }
 
 export default async function ProductsPage() {
-  // Fetch data on the server using our tRPC server client
-  const productListData = await serverApi.product.list.query({ limit: 12 })
+  // Create a server-side caller for tRPC
+  const serverContext = await createContext()
+  const caller = appRouter.createCaller(serverContext)
+
+  // Fetch data on the server using the caller
+  const productListData = await caller.product.list({ limit: 12 })
 
   return (
     <div className="container py-10">
