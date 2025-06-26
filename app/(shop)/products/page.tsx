@@ -9,12 +9,21 @@ export const metadata = {
 }
 
 export default async function ProductsPage() {
-  // Create a server-side caller for tRPC
   const serverContext = await createContext()
   const caller = appRouter.createCaller(serverContext)
 
-  // Fetch data on the server using the caller
   const productListData = await caller.product.list({ limit: 12 })
+
+  // Transform non-serializable data (Decimal) into serializable data (number)
+  // before passing it to the Client Component.
+  const serializableProducts = productListData.items.map((product) => ({
+    ...product,
+    price: product.price.toNumber(),
+    variants: product.variants.map((variant) => ({
+      ...variant,
+      price: variant.price.toNumber(),
+    })),
+  }))
 
   return (
     <div className="container py-10">
@@ -26,16 +35,15 @@ export default async function ProductsPage() {
         </p>
       </section>
 
-      {productListData.items.length === 0 ? (
+      {serializableProducts.length === 0 ? (
         <p className="text-center text-muted-foreground">No products found. Please check back soon!</p>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8">
-          {productListData.items.map((product) => (
+          {serializableProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}
-      {/* Pagination can be added here later */}
     </div>
   )
 }
