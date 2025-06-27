@@ -1,50 +1,76 @@
 // app/(shop)/products/page.tsx
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+import { api } from '@/lib/api/trpc'
 import { ProductCard } from '@/components/features/product/ProductCard'
-import { appRouter } from '@/server/routers'
-import { createContext } from '@/server/context'
+import { FiltersSidebar } from '@/components/features/shop/FiltersSidebar'
+import { CategoryFilterBar } from '@/components/features/shop/CategoryFilterBar'
+import { SortDropdown } from '@/components/features/shop/SortDropdown'
 
-export const metadata = {
-  title: 'All Products',
-  description: 'Explore our full collection of premium, natural aromatherapy products.',
-}
+export default function ProductsPage() {
+  const searchParams = useSearchParams()
 
-// Revalidate this page every hour (3600 seconds)
-export const revalidate = 3600;
+  const category = searchParams.get('category') || undefined
+  const sort = searchParams.get('sort') || 'createdAt_desc'
+  const [sortBy, sortOrder] = sort.split('_') as ['createdAt' | 'price', 'asc' | 'desc']
+  
+  const { data, isLoading, isError } = api.product.list.useQuery({
+    limit: 12,
+    category,
+    sortBy,
+    sortOrder,
+  })
 
-export default async function ProductsPage() {
-  const serverContext = await createContext()
-  const caller = appRouter.createCaller(serverContext)
-
-  const productListData = await caller.product.list({ limit: 12 })
-
-  const serializableProducts = productListData.items.map((product) => ({
-    ...product,
-    price: product.price.toNumber(),
-    variants: product.variants.map((variant) => ({
-      ...variant,
-      price: variant.price.toNumber(),
-    })),
-  }))
+  // The data is already serializable, so we can use it directly.
+  const products = data?.items || []
+  const categoryName = products[0]?.category.name || 'Products'
 
   return (
-    <div className="container py-10">
-      <section className="mb-12 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Our Collection</h1>
-        <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-          Discover scents that soothe, uplift, and transform. Each product is crafted with the
-          purest ingredients to elevate your daily rituals.
-        </p>
-      </section>
+    <div className="container my-12">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-4 lg:gap-12">
+        <aside className="lg:col-span-1">
+          <FiltersSidebar />
+        </aside>
 
-      {serializableProducts.length === 0 ? (
-        <p className="text-center text-muted-foreground">No products found. Please check back soon!</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8">
-          {serializableProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+        <main className="lg:col-span-3">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold tracking-tight">
+              {category ? categoryName : 'All Products'}
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              Discover scents that soothe, uplift, and transform.
+            </p>
+          </header>
+          
+          <div className="border-b pb-4 mb-6">
+            <CategoryFilterBar />
+          </div>
+
+          <div className="flex justify-between items-center mb-6">
+            <p className="text-sm text-muted-foreground">
+              Showing {products.length} products
+            </p>
+            <SortDropdown />
+          </div>
+
+          {isLoading && <p>Loading products...</p>}
+          {isError && <p>Could not load products. Please try again later.</p>}
+          
+          {!isLoading && !isError && products.length === 0 ? (
+            <div className="text-center py-16">
+              <h3 className="text-xl font-semibold">No Products Found</h3>
+              <p className="text-muted-foreground mt-2">Try adjusting your filters.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }

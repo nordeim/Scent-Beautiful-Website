@@ -35,3 +35,6 @@ please create for me a *complete* updated *replacement* file for `prisma/seed.ts
 ---
 please very carefully review and validate all the files you just generated that they are indeed *complete replacement* files with no "placeholders" like "// ... (rest of the file is the same as the version above)". please use line by line diff to carefully and completely validate all the files you generated in the last round are indeed correct and accurate and *complete* (self-contained(, then give me a detailed assessment report on your validate. The key is not to introduce any regression errors or accidentally omit some original features and functions when enhancing a production ready project codebase! we cannot afford to mess up a production ready project and do injustice to our newest project `README.md`. so please do your very best due diligence in your double-check and double-confirm validation.
 
+---
+excellent result so far! please help me carefully and systematically validate the application start up log below:
+

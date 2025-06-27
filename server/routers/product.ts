@@ -3,6 +3,16 @@ import { z } from 'zod'
 import { router, publicProcedure, protectedProcedure } from '../trpc'
 import { TRPCError } from '@trpc/server'
 
+// Helper function to serialize product data, converting Decimal to number
+const serializeProduct = (product: any) => ({
+  ...product,
+  price: product.price.toNumber(),
+  variants: product.variants.map((variant: any) => ({
+    ...variant,
+    price: variant.price.toNumber(),
+  })),
+});
+
 export const productRouter = router({
   list: publicProcedure
     .input(
@@ -10,41 +20,50 @@ export const productRouter = router({
         limit: z.number().min(1).max(100).default(12),
         cursor: z.string().nullish(),
         category: z.string().optional(),
-        sortBy: z.enum(['price', 'createdAt']).default('createdAt'),
+        sortBy: z.enum(['createdAt', 'price']).default('createdAt'),
         sortOrder: z.enum(['asc', 'desc']).default('desc'),
+        minPrice: z.number().optional(),
+        maxPrice: z.number().optional(),
+        searchQuery: z.string().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
+      const { limit, cursor, category, sortBy, sortOrder, minPrice, maxPrice, searchQuery } = input
+      
+      const whereClause: any = { isActive: true };
+      if (category) whereClause.category = { slug: category };
+      if (minPrice !== undefined || maxPrice !== undefined) {
+        whereClause.price = {};
+        if (minPrice !== undefined) whereClause.price.gte = minPrice;
+        if (maxPrice !== undefined) whereClause.price.lte = maxPrice;
+      }
+      if (searchQuery) {
+        whereClause.OR = [
+          { name: { contains: searchQuery, mode: 'insensitive' } },
+          { description: { contains: searchQuery, mode: 'insensitive' } },
+        ];
+      }
+      
       const products = await ctx.prisma.product.findMany({
-        take: input.limit + 1,
-        where: {
-          isActive: true,
-          category: input.category ? { slug: input.category } : undefined,
-        },
-        cursor: input.cursor ? { id: input.cursor } : undefined,
-        orderBy: {
-          [input.sortBy]: input.sortOrder,
-        },
+        take: limit + 1,
+        where: whereClause,
+        cursor: cursor ? { id: cursor } : undefined,
+        orderBy: { [sortBy]: sortOrder },
         include: {
-          variants: {
-            orderBy: { price: 'asc' },
-            take: 1,
-          },
-          images: {
-            where: { isPrimary: true },
-            take: 1,
-          },
+          category: { select: { name: true, slug: true } },
+          variants: { orderBy: { price: 'asc' }, take: 1 },
+          images: { where: { isPrimary: true }, take: 1 },
         },
       })
 
-      let nextCursor: typeof input.cursor | undefined = undefined
-      if (products.length > input.limit) {
+      let nextCursor: typeof cursor | undefined = undefined
+      if (products.length > limit) {
         const nextItem = products.pop()
         nextCursor = nextItem!.id
       }
 
       return {
-        items: products,
+        items: products.map(serializeProduct),
         nextCursor,
       }
     }),
@@ -57,16 +76,7 @@ export const productRouter = router({
         include: {
           variants: true,
           images: true,
-          reviews: {
-            include: {
-              user: {
-                select: {
-                  firstName: true,
-                  avatarUrl: true,
-                },
-              },
-            },
-          },
+          reviews: { include: { user: { select: { firstName: true, avatarUrl: true } } } },
           category: true,
           brand: true,
         },
@@ -79,7 +89,7 @@ export const productRouter = router({
         })
       }
 
-      return product
+      return serializeProduct(product);
     }),
 
   getRelated: publicProcedure
@@ -93,16 +103,22 @@ export const productRouter = router({
         where: {
           isActive: true,
           categoryId: input.categoryId,
-          id: {
-            not: input.currentProductId, // Exclude the current product
-          },
+          id: { not: input.currentProductId },
         },
         include: {
           variants: { orderBy: { price: 'asc' }, take: 1 },
           images: { where: { isPrimary: true }, take: 1 },
         },
       });
-      return products;
+      return products.map(serializeProduct);
+    }),
+  
+  getCategoryList: publicProcedure
+    .query(async ({ ctx }) => {
+      return ctx.prisma.category.findMany({
+        where: { isActive: true },
+        orderBy: { name: 'asc' },
+      })
     }),
 
   create: protectedProcedure
@@ -134,4 +150,4 @@ export const productRouter = router({
       })
       return product
     }),
-})
+});

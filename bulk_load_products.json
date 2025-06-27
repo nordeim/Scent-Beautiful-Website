@@ -1,0 +1,62 @@
+[
+  {
+    "id": "prod_5",
+    "sku": "SOAP-OAT-02",
+    "name": "Oat & Honey Soap",
+    "slug": "oat-and-honey-soap",
+    "description": "A gentle, exfoliating soap bar made with colloidal oatmeal and raw honey. Perfect for soothing sensitive or irritated skin while providing a rich, comforting lather.",
+    "shortDescription": "Soothing and exfoliating oatmeal soap.",
+    "price": 13.50,
+    "isActive": true,
+    "isFeatured": true,
+    "category": {
+      "name": "Natural Soaps",
+      "slug": "natural-soaps"
+    },
+    "variants": [
+      {
+        "sku": "SOAP-OAT-02-BAR",
+        "name": "120g Bar",
+        "price": 13.50,
+        "inventoryQuantity": 200
+      }
+    ],
+    "images": [
+      {
+        "url": "/images/products/prod_5.jpg",
+        "altText": "A handcrafted bar of oat and honey soap on a wooden surface.",
+        "isPrimary": true
+      }
+    ]
+  },
+  {
+    "id": "prod_6",
+    "sku": "EO-SLEEP-04",
+    "name": "Peaceful Night Blend",
+    "slug": "peaceful-night-blend",
+    "description": "A serene blend of Lavender, Chamomile, and Sandalwood essential oils, expertly crafted to promote deep relaxation and a restful night's sleep. Ideal for evening diffusion.",
+    "shortDescription": "A calming blend for restful sleep.",
+    "price": 32.00,
+    "isActive": true,
+    "isFeatured": false,
+    "category": {
+      "name": "Essential Oils",
+      "slug": "essential-oils"
+    },
+    "variants": [
+      {
+        "sku": "EO-SLEEP-04-15ML",
+        "name": "15ml Bottle",
+        "price": 32.00,
+        "inventoryQuantity": 75
+      }
+    ],
+    "images": [
+      {
+        "url": "/images/products/prod_6.jpg",
+        "altText": "A dark glass bottle of Peaceful Night essential oil blend next to a sleeping mask.",
+        "isPrimary": true
+      }
+    ]
+  }
+]
