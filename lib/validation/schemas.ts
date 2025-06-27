@@ -25,6 +25,12 @@ export const shippingAddressSchema = z.object({
   phone: z.string().optional(),
 })
 
+export const newsletterSchema = z.object({
+  email: z.string().email({ message: 'Please enter a valid email.' }),
+})
+
+
 export type TLoginSchema = z.infer<typeof loginSchema>
 export type TRegisterSchema = z.infer<typeof registerSchema>
 export type TShippingAddressSchema = z.infer<typeof shippingAddressSchema>
+export type TNewsletterSchema = z.infer<typeof newsletterSchema>

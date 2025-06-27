@@ -7,12 +7,15 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Starting seed process...')
 
+  // 1. Clear existing data to ensure a clean slate
   console.log('   - Deleting existing data...')
   await prisma.product.deleteMany({})
   await prisma.category.deleteMany({})
   await prisma.user.deleteMany({})
+  await prisma.emailSubscription.deleteMany({})
   console.log('   ✓ Existing data cleared.')
 
+  // 2. Seed a test user
   const hashedPassword = await hash('StrongPass123!', 12)
   const user = await prisma.user.create({
     data: {
@@ -26,12 +29,12 @@ async function main() {
   })
   console.log(`   ✓ Created user: ${user.email}`)
 
+  // 3. Seed categories
   const oilsCategory = await prisma.category.create({
     data: {
       name: 'Essential Oils',
       slug: 'essential-oils',
       description: 'Pure, single-note and blended essential oils for aromatherapy.',
-      imageUrl: 'https://res.cloudinary.com/your-cloud-name/image/upload/v1719468695/scent-assets/category-oils_p6kspc.jpg',
     },
   })
   const soapsCategory = await prisma.category.create({
@@ -39,15 +42,16 @@ async function main() {
       name: 'Natural Soaps',
       slug: 'natural-soaps',
       description: 'Handcrafted soaps with natural ingredients and essential oils.',
-      imageUrl: 'https://res.cloudinary.com/your-cloud-name/image/upload/v1719468695/scent-assets/category-soaps_o9o6yq.jpg',
     },
   })
   console.log(`   ✓ Created categories: "${oilsCategory.name}" and "${soapsCategory.name}"`)
 
+  // 4. Seed products
   console.log('   - Seeding products...')
 
   await prisma.product.create({
     data: {
+      id: 'prod_1',
       name: 'Lavender Dreams',
       slug: 'lavender-dreams',
       sku: 'EO-LAV-01',
@@ -59,12 +63,13 @@ async function main() {
       modelUrl: '/models/bottle.glb',
       category: { connect: { id: oilsCategory.id } },
       variants: { create: { sku: 'EO-LAV-01-15ML', name: '15ml Bottle', price: 29.99, inventoryQuantity: 100 } },
-      images: { create: { url: 'https://res.cloudinary.com/your-cloud-name/image/upload/v1719468694/scent-assets/product-lavender_vc4k5p.jpg', altText: 'A glass bottle of Lavender Dreams essential oil.', isPrimary: true } },
+      images: { create: { url: '/images/products/prod_1.jpg', altText: 'A glass bottle of Lavender Dreams essential oil.', isPrimary: true } },
     },
   })
 
   await prisma.product.create({
     data: {
+      id: 'prod_2',
       name: 'Citrus Burst Oil',
       slug: 'citrus-burst-oil',
       sku: 'EO-CIT-02',
@@ -75,12 +80,13 @@ async function main() {
       isFeatured: true,
       category: { connect: { id: oilsCategory.id } },
       variants: { create: { sku: 'EO-CIT-02-15ML', name: '15ml Bottle', price: 24.99, inventoryQuantity: 80 } },
-      images: { create: { url: 'https://res.cloudinary.com/your-cloud-name/image/upload/v1719468694/scent-assets/product-citrus_hxgjmu.jpg', altText: 'A bottle of citrus oil surrounded by fresh fruits.', isPrimary: true } },
+      images: { create: { url: '/images/products/prod_2.jpg', altText: 'A bottle of citrus oil surrounded by fresh fruits.', isPrimary: true } },
     },
   })
 
   await prisma.product.create({
     data: {
+      id: 'prod_3',
       name: 'Rose Petal Soap',
       slug: 'rose-petal-soap',
       sku: 'SOAP-ROS-01',
@@ -91,12 +97,13 @@ async function main() {
       isFeatured: false,
       category: { connect: { id: soapsCategory.id } },
       variants: { create: { sku: 'SOAP-ROS-01-BAR', name: '120g Bar', price: 12.50, inventoryQuantity: 150 } },
-      images: { create: { url: 'https://res.cloudinary.com/your-cloud-name/image/upload/v1719468695/scent-assets/product-rose-soap_n6e9w4.jpg', altText: 'A bar of pink soap with rose petals.', isPrimary: true } },
+      images: { create: { url: '/images/products/prod_3.jpg', altText: 'A bar of pink soap with rose petals.', isPrimary: true } },
     },
   })
 
   await prisma.product.create({
     data: {
+      id: 'prod_4',
       name: 'Eucalyptus Clarity',
       slug: 'eucalyptus-clarity',
       sku: 'EO-EUC-03',
@@ -107,7 +114,7 @@ async function main() {
       isFeatured: false,
       category: { connect: { id: oilsCategory.id } },
       variants: { create: { sku: 'EO-EUC-03-15ML', name: '15ml Bottle', price: 19.99, inventoryQuantity: 120 } },
-      images: { create: { url: 'https://res.cloudinary.com/your-cloud-name/image/upload/v1719468695/scent-assets/product-eucalyptus_k38btr.jpg', altText: 'A bottle of eucalyptus oil with fresh leaves.', isPrimary: true } },
+      images: { create: { url: '/images/products/prod_4.jpg', altText: 'A bottle of eucalyptus oil with fresh leaves.', isPrimary: true } },
     },
   })
 

@@ -4,7 +4,8 @@ import { cartRouter } from './cart'
 import { orderRouter } from './order'
 import { userRouter } from './user'
 import { checkoutRouter } from './checkout'
-import { journalRouter } from './journal' // New import
+import { journalRouter } from './journal'
+import { newsletterRouter } from './newsletter' // New import
 import { router } from '../trpc'
 
 export const appRouter = router({
@@ -13,7 +14,8 @@ export const appRouter = router({
   order: orderRouter,
   user: userRouter,
   checkout: checkoutRouter,
-  journal: journalRouter, // New router registered
+  journal: journalRouter,
+  newsletter: newsletterRouter, // New router registered
 })
 
 export type AppRouter = typeof appRouter
