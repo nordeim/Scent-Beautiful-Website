@@ -1,9 +1,11 @@
-# find .gitignore .husky .prettierrc .eslintrc.json .env.local *json *ts *js app components hooks lib prisma public server store types tests README.md -type f
+# List of files in the current codebase. Do not make up the content of a file, always load and read the actual file. If a file is not listed here, ask me for it.
+# find .gitignore .husky .prettierrc .eslintrc.json .env.local *json *ts *js docker-compose.yml app components hooks lib prisma public server store types scripts tests README.md -type f
 .gitignore
 .husky/pre-commit
 .prettierrc
 .eslintrc.json
 .env.local
+bulk_load_products.json
 package-lock.json
 package.json
 tsconfig.json
@@ -24,8 +26,12 @@ components/features/product/ProductInfo.tsx
 components/features/product/RelatedProducts.tsx
 components/features/auth/AuthForm.tsx
 components/features/newsletter/NewsletterForm.tsx
+components/features/shop/SortDropdown.tsx
+components/features/shop/CategoryFilterBar.tsx
+components/features/shop/FiltersSidebar.tsx
 components/features/journal/PostBody.tsx
 components/common/Card.tsx
+components/common/Input.tsx
 components/common/Layout/Header.tsx
 components/common/Layout/Footer.tsx
 components/common/Button.tsx
@@ -33,9 +39,11 @@ components/common/Card.test.tsx
 components/common/Sheet.tsx
 components/common/Tabs.tsx
 components/common/Button.test.tsx
+components/common/Skeletons.tsx
 components/common/Badge.tsx
 middleware.ts
 next-env.d.ts
+scripts/database/bulk_load_products.py
 tailwind.config.ts
 tests/e2e/auth.spec.ts
 tests/e2e/account.spec.ts
@@ -44,6 +52,7 @@ tests/setup/jest.setup.ts
 jest.config.js
 next.config.js
 postcss.config.mjs
+docker-compose.yml
 app/account/profile/page.tsx
 app/account/layout.tsx
 app/account/orders/page.tsx
@@ -92,8 +101,12 @@ components/features/product/ProductInfo.tsx
 components/features/product/RelatedProducts.tsx
 components/features/auth/AuthForm.tsx
 components/features/newsletter/NewsletterForm.tsx
+components/features/shop/SortDropdown.tsx
+components/features/shop/CategoryFilterBar.tsx
+components/features/shop/FiltersSidebar.tsx
 components/features/journal/PostBody.tsx
 components/common/Card.tsx
+components/common/Input.tsx
 components/common/Layout/Header.tsx
 components/common/Layout/Footer.tsx
 components/common/Button.tsx
@@ -101,6 +114,7 @@ components/common/Card.test.tsx
 components/common/Sheet.tsx
 components/common/Tabs.tsx
 components/common/Button.test.tsx
+components/common/Skeletons.tsx
 components/common/Badge.tsx
 hooks/use-cart.ts
 lib/db/client.ts
@@ -115,6 +129,7 @@ lib/api/trpc.ts
 lib/payments/stripe.ts
 lib/email/sender.ts
 lib/search/algolia.ts
+lib/config/shop.ts
 lib/storage/s3.ts
 prisma/schema.prisma
 prisma/migrations/20250626145128_imageurl/migration.sql
@@ -150,6 +165,7 @@ store/cart.store.ts
 types/index.d.ts
 types/next-auth.d.ts
 types/database.d.ts
+scripts/database/bulk_load_products.py
 tests/e2e/auth.spec.ts
 tests/e2e/account.spec.ts
 tests/e2e/shop.spec.ts

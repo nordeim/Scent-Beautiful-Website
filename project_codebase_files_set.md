@@ -33,7 +33,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env
+.env*
 
 # vercel
 .vercel
@@ -170,6 +170,73 @@ NEXT_PUBLIC_SANITY_API_VERSION="2024-06-28"
 # Optional: Create a read-only token for production builds if your dataset is private
 # SANITY_API_READ_TOKEN="REPLACE_WITH_YOUR_SANITY_TOKEN"
 
+
+```
+
+# bulk_load_products.json
+```json
+[
+  {
+    "id": "prod_5",
+    "sku": "SOAP-OAT-02",
+    "name": "Oat & Honey Soap",
+    "slug": "oat-and-honey-soap",
+    "description": "A gentle, exfoliating soap bar made with colloidal oatmeal and raw honey. Perfect for soothing sensitive or irritated skin while providing a rich, comforting lather.",
+    "shortDescription": "Soothing and exfoliating oatmeal soap.",
+    "price": 13.50,
+    "isActive": true,
+    "isFeatured": true,
+    "category": {
+      "name": "Natural Soaps",
+      "slug": "natural-soaps"
+    },
+    "variants": [
+      {
+        "sku": "SOAP-OAT-02-BAR",
+        "name": "120g Bar",
+        "price": 13.50,
+        "inventoryQuantity": 200
+      }
+    ],
+    "images": [
+      {
+        "url": "/images/products/prod_5.jpg",
+        "altText": "A handcrafted bar of oat and honey soap on a wooden surface.",
+        "isPrimary": true
+      }
+    ]
+  },
+  {
+    "id": "prod_6",
+    "sku": "EO-SLEEP-04",
+    "name": "Peaceful Night Blend",
+    "slug": "peaceful-night-blend",
+    "description": "A serene blend of Lavender, Chamomile, and Sandalwood essential oils, expertly crafted to promote deep relaxation and a restful night's sleep. Ideal for evening diffusion.",
+    "shortDescription": "A calming blend for restful sleep.",
+    "price": 32.00,
+    "isActive": true,
+    "isFeatured": false,
+    "category": {
+      "name": "Essential Oils",
+      "slug": "essential-oils"
+    },
+    "variants": [
+      {
+        "sku": "EO-SLEEP-04-15ML",
+        "name": "15ml Bottle",
+        "price": 32.00,
+        "inventoryQuantity": 75
+      }
+    ],
+    "images": [
+      {
+        "url": "/images/products/prod_6.jpg",
+        "altText": "A dark glass bottle of Peaceful Night essential oil blend next to a sleeping mask.",
+        "isPrimary": true
+      }
+    ]
+  }
+]
 
 ```
 
@@ -11943,10 +12010,10 @@ export function OrderHistoryItem({ order }: OrderHistoryItemProps) {
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { shippingAddressSchema, TShippingAddressSchema } from '@/lib/validation/schemas'
-import { useStripe } from '@stripe/react-stripe-js'
-import { PaymentElement, useElements } from '@stripe/react-stripe-js'
+import { useStripe, PaymentElement, useElements } from '@stripe/react-stripe-js'
 import { useState } from 'react'
 import { Button } from '@/components/common/Button'
+import { Input } from '@/components/common/Input' // Import new component
 
 export function CheckoutForm() {
   const stripe = useStripe()
@@ -11963,17 +12030,12 @@ export function CheckoutForm() {
   })
 
   const processSubmit = async (data: TShippingAddressSchema) => {
-    if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      return
-    }
-
+    if (!stripe || !elements) return
     setIsLoading(true)
 
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // Make sure to change this to your payment completion page
         return_url: `${window.location.origin}/order-confirmation`,
         shipping: {
           name: `${data.firstName} ${data.lastName}`,
@@ -11989,9 +12051,6 @@ export function CheckoutForm() {
       },
     })
     
-    // This point will only be reached if there is an immediate error when
-    // confirming the payment. Otherwise, your customer will be redirected to
-    // your `return_url`.
     if (error.type === 'card_error' || error.type === 'validation_error') {
       setErrorMessage(error.message || 'An unexpected error occurred.')
     } else {
@@ -12008,42 +12067,41 @@ export function CheckoutForm() {
         <div className="mt-4 grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
             <div>
                 <label htmlFor="firstName">First name</label>
-                <input type="text" id="firstName" {...register('firstName')} className="input-style mt-1"/>
+                <Input type="text" id="firstName" {...register('firstName')} className="mt-1"/>
                 {errors.firstName && <p className="error-text">{errors.firstName.message}</p>}
             </div>
             <div>
                 <label htmlFor="lastName">Last name</label>
-                <input type="text" id="lastName" {...register('lastName')} className="input-style mt-1"/>
+                <Input type="text" id="lastName" {...register('lastName')} className="mt-1"/>
                 {errors.lastName && <p className="error-text">{errors.lastName.message}</p>}
             </div>
             <div className="sm:col-span-2">
                 <label htmlFor="addressLine1">Address</label>
-                <input type="text" id="addressLine1" {...register('addressLine1')} className="input-style mt-1"/>
+                <Input type="text" id="addressLine1" {...register('addressLine1')} className="mt-1"/>
                 {errors.addressLine1 && <p className="error-text">{errors.addressLine1.message}</p>}
             </div>
              <div className="sm:col-span-2">
                 <label htmlFor="addressLine2">Apartment, suite, etc. (Optional)</label>
-                <input type="text" id="addressLine2" {...register('addressLine2')} className="input-style mt-1"/>
+                <Input type="text" id="addressLine2" {...register('addressLine2')} className="mt-1"/>
             </div>
             <div>
                 <label htmlFor="city">City</label>
-                <input type="text" id="city" {...register('city')} className="input-style mt-1"/>
+                <Input type="text" id="city" {...register('city')} className="mt-1"/>
                 {errors.city && <p className="error-text">{errors.city.message}</p>}
             </div>
              <div>
                 <label htmlFor="stateProvince">State / Province</label>
-                <input type="text" id="stateProvince" {...register('stateProvince')} className="input-style mt-1"/>
+                <Input type="text" id="stateProvince" {...register('stateProvince')} className="mt-1"/>
                 {errors.stateProvince && <p className="error-text">{errors.stateProvince.message}</p>}
             </div>
             <div>
                 <label htmlFor="postalCode">Postal code</label>
-                <input type="text" id="postalCode" {...register('postalCode')} className="input-style mt-1"/>
+                <Input type="text" id="postalCode" {...register('postalCode')} className="mt-1"/>
                 {errors.postalCode && <p className="error-text">{errors.postalCode.message}</p>}
             </div>
             <div>
                 <label htmlFor="countryCode">Country</label>
-                {/* In a real app, this would be a dropdown */}
-                <input type="text" id="countryCode" {...register('countryCode')} className="input-style mt-1" defaultValue="US"/>
+                <Input type="text" id="countryCode" {...register('countryCode')} className="mt-1" defaultValue="US"/>
                 {errors.countryCode && <p className="error-text">{errors.countryCode.message}</p>}
             </div>
         </div>
@@ -12536,7 +12594,6 @@ export function RelatedProducts({ categoryId, currentProductId }: RelatedProduct
 'use client'
 
 import React, { useState } from 'react'
-import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signIn } from 'next-auth/react'
@@ -12546,7 +12603,8 @@ import { api } from '@/lib/api/trpc'
 import { Button } from '@/components/common/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/common/Card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/common/Tabs'
-import { Chrome } from 'lucide-react' // Using Chrome as a generic "Google" icon
+import { Input } from '@/components/common/Input' // Import new component
+import { Chrome } from 'lucide-react'
 
 interface AuthFormProps {
   defaultTab: 'login' | 'register'
@@ -12572,13 +12630,10 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
 
   const registerUser = api.user.register.useMutation({
     onSuccess: () => {
-      // On successful registration, switch to login tab and show a success message
       setActiveTab('login')
       resetRegisterForm()
-      // Can add a toast notification here in the future
     },
     onError: (error) => {
-      // Handle errors, e.g., user already exists
       console.error('Registration failed:', error.message)
     },
   })
@@ -12593,7 +12648,7 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
     if (result?.error) {
       setLoginError('root', { message: 'Invalid email or password.' })
     } else {
-      router.push('/account/profile') // Redirect to a protected page on success
+      router.push('/account/profile')
       router.refresh()
     }
   }
@@ -12609,7 +12664,6 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
         <TabsTrigger value="register">Create Account</TabsTrigger>
       </TabsList>
 
-      {/* Login Form */}
       <TabsContent value="login">
         <Card>
           <CardHeader>
@@ -12620,36 +12674,30 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
             <form onSubmit={handleLoginSubmit(onLoginSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="login-email">Email</label>
-                <input id="login-email" {...registerLogin('email')} className="w-full input-style" />
+                <Input id="login-email" type="email" {...registerLogin('email')} />
                 {loginErrors.email && <p className="error-text">{loginErrors.email.message}</p>}
               </div>
               <div className="space-y-2">
                 <label htmlFor="login-password">Password</label>
-                <input id="login-password" type="password" {...registerLogin('password')} className="w-full input-style" />
+                <Input id="login-password" type="password" {...registerLogin('password')} />
                 {loginErrors.password && <p className="error-text">{loginErrors.password.message}</p>}
               </div>
-              {loginErrors.root && <p className="error-text">{loginErrors.root.message}</p>}
+              {loginErrors.root && <p className="error-text text-center">{loginErrors.root.message}</p>}
               <Button type="submit" className="w-full" disabled={isLoginSubmitting}>
                 {isLoginSubmitting ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
             <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border dark:border-dark-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-limestone px-2 text-muted dark:bg-midnight dark:text-dark-muted">Or continue with</span>
-              </div>
+              <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+              <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Or continue with</span></div>
             </div>
             <Button variant="secondary" className="w-full" onClick={() => signIn('google')}>
-              <Chrome className="mr-2 h-4 w-4" />
-              Sign in with Google
+              <Chrome className="mr-2 h-4 w-4" /> Sign in with Google
             </Button>
           </CardContent>
         </Card>
       </TabsContent>
 
-      {/* Registration Form */}
       <TabsContent value="register">
         <Card>
           <CardHeader>
@@ -12661,26 +12709,26 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label htmlFor="firstName">First Name</label>
-                  <input id="firstName" {...registerRegister('firstName')} className="w-full input-style" />
+                  <Input id="firstName" {...registerRegister('firstName')} />
                   {registerErrors.firstName && <p className="error-text">{registerErrors.firstName.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="lastName">Last Name</label>
-                  <input id="lastName" {...registerRegister('lastName')} className="w-full input-style" />
+                  <Input id="lastName" {...registerRegister('lastName')} />
                   {registerErrors.lastName && <p className="error-text">{registerErrors.lastName.message}</p>}
                 </div>
               </div>
               <div className="space-y-2">
                 <label htmlFor="register-email">Email</label>
-                <input id="register-email" {...registerRegister('email')} className="w-full input-style" />
+                <Input id="register-email" type="email" {...registerRegister('email')} />
                 {registerErrors.email && <p className="error-text">{registerErrors.email.message}</p>}
               </div>
               <div className="space-y-2">
                 <label htmlFor="register-password">Password</label>
-                <input id="register-password" type="password" {...registerRegister('password')} className="w-full input-style" />
+                <Input id="register-password" type="password" {...registerRegister('password')} />
                 {registerErrors.password && <p className="error-text">{registerErrors.password.message}</p>}
               </div>
-               {registerUser.isError && <p className="error-text">{registerUser.error.message}</p>}
+              {registerUser.isError && <p className="error-text">{registerUser.error.message}</p>}
               <Button type="submit" className="w-full" disabled={isRegisterSubmitting}>
                 {isRegisterSubmitting ? 'Creating Account...' : 'Create Account'}
               </Button>
@@ -12691,10 +12739,6 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
     </Tabs>
   )
 }
-
-// Add these helper classes to app/globals.css
-// .input-style { @apply block w-full rounded-md border-0 py-1.5 px-2 text-charcoal dark:text-pearl shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sage dark:bg-charcoal dark:ring-dark-border; }
-// .error-text { @apply text-sm text-red-600 mt-1; }
 
 ```
 
@@ -12709,6 +12753,7 @@ import { newsletterSchema, TNewsletterSchema } from '@/lib/validation/schemas'
 import { api } from '@/lib/api/trpc'
 import { Button } from '@/components/common/Button'
 import { useState } from 'react'
+import { Input } from '@/components/common/Input' // Import new component
 
 export function NewsletterForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -12728,20 +12773,19 @@ export function NewsletterForm() {
       reset()
     },
     onError: (error) => {
-      // In a real app, you might show this error to the user
       console.error('Subscription failed:', error)
       setSuccessMessage('Something went wrong. Please try again.')
     },
   })
 
   const onSubmit = (data: TNewsletterSchema) => {
-    setSuccessMessage(null) // Clear previous messages
+    setSuccessMessage(null)
     subscribe.mutate(data)
   }
 
   if (successMessage) {
     return (
-      <div className="text-center p-4 bg-sage-500/10 border border-sage-500/20 rounded-md">
+      <div className="text-center p-4 bg-primary/10 border border-primary/20 rounded-md">
         <p className="font-semibold text-primary">{successMessage}</p>
       </div>
     )
@@ -12750,17 +12794,184 @@ export function NewsletterForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
       <div className="flex w-full max-w-sm items-center space-x-2">
-        <input
+        <Input
           {...register('email')}
           type="email"
           placeholder="Enter your email"
-          className="flex-1 bg-stone-900/50 border border-stone-700 px-3 py-2 text-sm rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+          // This input needs a specific style for its context in the dark footer
+          className="flex-1 bg-stone-900/50 border-stone-700 placeholder:text-stone-400 focus:ring-primary"
         />
         <Button type="submit" variant="primary" size="sm" disabled={subscribe.isPending}>
           {subscribe.isPending ? 'Subscribing...' : 'Subscribe'}
         </Button>
       </div>
-      {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+      {errors.email && <p className="error-text">{errors.email.message}</p>}
+    </form>
+  )
+}
+
+```
+
+# components/features/shop/SortDropdown.tsx
+```tsx
+// components/features/shop/SortDropdown.tsx
+'use client'
+
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { SORT_OPTIONS } from '@/lib/config/shop'
+
+export function SortDropdown() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const currentSort = searchParams.get('sort') || SORT_OPTIONS.LATEST
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const params = new URLSearchParams(searchParams)
+    params.set('sort', e.target.value)
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <label htmlFor="sort" className="text-sm text-muted-foreground">Sort by:</label>
+      <select
+        id="sort"
+        value={currentSort}
+        onChange={handleSortChange}
+        className="input-style text-sm py-1"
+      >
+        <option value={SORT_OPTIONS.LATEST}>Latest</option>
+        <option value={SORT_OPTIONS.PRICE_ASC}>Price: Low to High</option>
+        <option value={SORT_OPTIONS.PRICE_DESC}>Price: High to Low</option>
+      </select>
+    </div>
+  )
+}
+
+```
+
+# components/features/shop/CategoryFilterBar.tsx
+```tsx
+// components/features/shop/CategoryFilterBar.tsx
+'use client'
+
+import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { api } from '@/lib/api/trpc'
+import { cn } from '@/lib/utils'
+
+export function CategoryFilterBar() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const currentCategory = searchParams.get('category')
+
+  const { data: categories, isLoading } = api.product.getCategoryList.useQuery() // We'll need to create this procedure
+
+  const createQueryString = (name: string, value: string) => {
+    const params = new URLSearchParams(searchParams)
+    params.set(name, value)
+    return params.toString()
+  }
+
+  if (isLoading || !categories) {
+    return <div className="h-6 bg-stone-200 dark:bg-stone-800 rounded-md animate-pulse" />
+  }
+
+  return (
+    <nav className="flex flex-wrap gap-x-4 gap-y-2 items-center">
+      <Link
+        href={pathname}
+        className={cn('px-3 py-1 text-sm rounded-full transition-colors',
+          !currentCategory ? 'bg-primary text-primary-foreground' : 'hover:bg-accent/50'
+        )}
+      >
+        All Products
+      </Link>
+      {categories.map((cat) => (
+        <Link
+          key={cat.id}
+          href={`${pathname}?${createQueryString('category', cat.slug)}`}
+          className={cn('px-3 py-1 text-sm rounded-full transition-colors',
+            currentCategory === cat.slug ? 'bg-primary text-primary-foreground' : 'hover:bg-accent/50'
+          )}
+        >
+          {cat.name}
+        </Link>
+      ))}
+    </nav>
+  )
+}
+
+```
+
+# components/features/shop/FiltersSidebar.tsx
+```tsx
+// components/features/shop/FiltersSidebar.tsx
+'use client'
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Button } from '@/components/common/Button'
+import { Search } from 'lucide-react'
+import { Input } from '@/components/common/Input' // Using the new Input component
+
+export function FiltersSidebar() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const handleApplyFilters = (formData: FormData) => {
+    const params = new URLSearchParams(searchParams)
+    const minPrice = formData.get('minPrice') as string
+    const maxPrice = formData.get('maxPrice') as string
+    const searchQuery = formData.get('q') as string // Changed from 'searchQuery' to 'q'
+
+    if (minPrice) params.set('minPrice', minPrice)
+    else params.delete('minPrice')
+    if (maxPrice) params.set('maxPrice', maxPrice)
+    else params.delete('maxPrice')
+    if (searchQuery) params.set('q', searchQuery)
+    else params.delete('q')
+
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
+  return (
+    <form action={handleApplyFilters} className="space-y-6 sticky top-24">
+      <div>
+        <h3 className="font-semibold mb-2">Search Products</h3>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            name="q" // Changed from 'searchQuery' to 'q'
+            type="search"
+            defaultValue={searchParams.get('q') || ''}
+            placeholder="Search..."
+            className="pl-9 w-full"
+          />
+        </div>
+      </div>
+      <div>
+        <h3 className="font-semibold mb-2">Price Range</h3>
+        <div className="flex items-center gap-2">
+          <Input
+            name="minPrice"
+            type="number"
+            defaultValue={searchParams.get('minPrice') || ''}
+            placeholder="Min"
+          />
+          <span>-</span>
+          <Input
+            name="maxPrice"
+            type="number"
+            defaultValue={searchParams.get('maxPrice') || ''}
+            placeholder="Max"
+          />
+        </div>
+      </div>
+      <Button type="submit" className="w-full">
+        Apply Filters
+      </Button>
     </form>
   )
 }
@@ -12772,13 +12983,13 @@ export function NewsletterForm() {
 // components/features/journal/PostBody.tsx
 'use client'
 
-import { PortableText } from '@portabletext/react'
+import { PortableText, type PortableTextBlock } from '@portabletext/react'
 import Image from 'next/image'
-import { urlForImage } from '@/lib/cms/image' // Helper to build image URLs
+import { urlForImage } from '@/lib/cms/image'
 
 const ptComponents = {
   types: {
-    image: ({ value }: { value: any }) => {
+    image: ({ value }: { value: PortableTextBlock & { asset?: any } }) => {
       if (!value?.asset?._ref) {
         return null
       }
@@ -12797,7 +13008,7 @@ const ptComponents = {
   },
 }
 
-export function PostBody({ content }: { content: any }) {
+export function PostBody({ content }: { content: PortableTextBlock[] }) {
   return (
     <div className="prose dark:prose-invert max-w-none">
       <PortableText value={content} components={ptComponents} />
@@ -12868,6 +13079,35 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 CardFooter.displayName = 'CardFooter'
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+
+```
+
+# components/common/Input.tsx
+```tsx
+// components/common/Input.tsx
+import * as React from 'react'
+import { cn } from '@/lib/utils'
+
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          className,
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+Input.displayName = 'Input'
+
+export { Input }
 
 ```
 
@@ -13405,6 +13645,52 @@ describe('Button Component', () => {
 
 ```
 
+# components/common/Skeletons.tsx
+```tsx
+// components/common/Skeletons.tsx
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/common/Card'
+import { Button } from './Button'
+import { AlertTriangle } from 'lucide-react'
+
+/**
+ * A skeleton component that mimics the layout of a ProductCard.
+ * Used to provide a better loading state UI on the products page.
+ */
+export function ProductCardSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="p-0">
+        <div className="relative aspect-square bg-stone-200 dark:bg-stone-800 animate-pulse" />
+      </CardHeader>
+      <CardContent className="p-4">
+        <div className="h-6 w-3/4 rounded-md bg-stone-200 dark:bg-stone-800 animate-pulse" />
+        <div className="mt-3 h-7 w-1/3 rounded-md bg-stone-200 dark:bg-stone-800 animate-pulse" />
+      </CardContent>
+      <CardFooter className="p-4 pt-0">
+        <div className="h-10 w-full rounded-md bg-stone-200 dark:bg-stone-800 animate-pulse" />
+      </CardFooter>
+    </Card>
+  )
+}
+
+/**
+ * A generic error component to display when tRPC queries fail.
+ */
+export function GenericError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-16 text-destructive">
+      <AlertTriangle className="h-12 w-12 mb-4" />
+      <h3 className="text-xl font-semibold mb-2">Something Went Wrong</h3>
+      <p className="text-muted-foreground mb-6">We couldn't load the requested data. Please try again.</p>
+      <Button onClick={onRetry} variant="destructive">
+        Try Again
+      </Button>
+    </div>
+  )
+}
+
+```
+
 # components/common/Badge.tsx
 ```tsx
 // components/common/Badge.tsx
@@ -13477,6 +13763,147 @@ export const config = {
 
 // NOTE: This file should not be edited
 // see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.
+
+```
+
+# scripts/database/bulk_load_products.py
+```py
+# File: scripts/database/bulk_load_products.py
+# pip install psycopg2-binary python-dotenv
+import os
+import json
+import psycopg2
+import sys
+from decimal import Decimal
+from dotenv import load_dotenv
+from urllib.parse import urlparse
+
+# Get the project root directory
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+# Load environment variables from .env file at the project root
+load_dotenv(os.path.join(project_root, '.env'))
+
+def parse_db_url(url):
+    """Parses a database URL into a dictionary of connection parameters."""
+    result = urlparse(url)
+    return {
+        'dbname': result.path[1:],
+        'user': result.username,
+        'password': result.password,
+        'host': result.hostname,
+        'port': result.port
+    }
+
+def get_db_connection():
+    """Establishes a connection to the PostgreSQL database."""
+    try:
+        db_url = os.getenv('DATABASE_URL')
+        if not db_url:
+            raise ValueError("DATABASE_URL environment variable not set.")
+        
+        conn_params = parse_db_url(db_url)
+        conn = psycopg2.connect(**conn_params)
+        return conn
+    except Exception as e:
+        print(f"Error connecting to the database: {e}", file=sys.stderr)
+        sys.exit(1)
+
+def load_products(conn, products_data):
+    """Loads a list of products into the database transactionally."""
+    with conn.cursor() as cur:
+        for product in products_data:
+            try:
+                print(f"Processing product: {product['name']}...")
+
+                # First, ensure the category exists and get its ID
+                cur.execute(
+                    """
+                    INSERT INTO "Category" (id, name, slug, "createdAt", "updatedAt", "isActive")
+                    VALUES (gen_random_uuid(), %s, %s, NOW(), NOW(), TRUE)
+                    ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+                    RETURNING id;
+                    """,
+                    (product['category']['name'], product['category']['slug'])
+                )
+                category_id = cur.fetchone()[0]
+                print(f"  ✓ Upserted category '{product['category']['name']}' with ID: {category_id}")
+
+                # Delete existing product with the same SKU for clean import
+                cur.execute('DELETE FROM "Product" WHERE sku = %s;', (product['sku'],))
+
+                # Insert the main product record
+                cur.execute(
+                    """
+                    INSERT INTO "Product" (id, sku, name, slug, description, "shortDescription", price, "isActive", "isFeatured", "categoryId", "createdAt", "updatedAt")
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                    RETURNING id;
+                    """,
+                    (
+                        product['id'], product['sku'], product['name'], product['slug'],
+                        product.get('description', ''), product.get('shortDescription', ''),
+                        Decimal(product['price']), product.get('isActive', True),
+                        product.get('isFeatured', False), category_id
+                    )
+                )
+                product_id = cur.fetchone()[0]
+                print(f"  ✓ Inserted product with ID: {product_id}")
+
+                # Insert variants
+                for variant in product.get('variants', []):
+                    cur.execute(
+                        """
+                        INSERT INTO "ProductVariant" ("id", "productId", sku, name, price, "inventoryQuantity", "createdAt", "updatedAt")
+                        VALUES (gen_random_uuid(), %s, %s, %s, %s, %s, NOW(), NOW());
+                        """,
+                        (
+                            product_id, variant['sku'], variant['name'],
+                            Decimal(variant['price']), variant['inventoryQuantity']
+                        )
+                    )
+                print(f"  ✓ Inserted {len(product.get('variants', []))} variant(s).")
+
+                # Insert images
+                for image in product.get('images', []):
+                    cur.execute(
+                        """
+                        INSERT INTO "ProductImage" ("id", "productId", url, "altText", "isPrimary", "createdAt")
+                        VALUES (gen_random_uuid(), %s, %s, %s, %s, NOW());
+                        """,
+                        (
+                            product_id, image['url'], image.get('altText', ''),
+                            image.get('isPrimary', False)
+                        )
+                    )
+                print(f"  ✓ Inserted {len(product.get('images', []))} image(s).")
+                
+                # Commit the transaction for this product
+                conn.commit()
+                print(f"✅ Successfully loaded {product['name']}.\n")
+
+            except Exception as e:
+                print(f"❌ Error loading product '{product.get('name', 'N/A')}': {e}", file=sys.stderr)
+                conn.rollback() # Rollback the transaction for the failed product
+
+def main():
+    """Main function to run the script."""
+    json_path = os.path.join(project_root, 'bulk_load_products.json')
+    
+    if not os.path.exists(json_path):
+        print(f"Error: JSON file not found at {json_path}", file=sys.stderr)
+        sys.exit(1)
+        
+    with open(json_path, 'r') as f:
+        products_to_load = json.load(f)
+
+    conn = get_db_connection()
+    try:
+        load_products(conn, products_to_load)
+    finally:
+        conn.close()
+        print("Database connection closed.")
+
+if __name__ == '__main__':
+    main()
 
 ```
 
@@ -13811,6 +14238,37 @@ const config = {
 };
 
 export default config;
+
+```
+
+# docker-compose.yml
+```yml
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16
+    container_name: the_scent_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: scent_user
+      POSTGRES_PASSWORD: StrongPass1234
+      POSTGRES_DB: scent_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+    driver: local
+
 
 ```
 
@@ -14287,31 +14745,59 @@ import { useEffect, useState } from 'react'
 import { api } from '@/lib/api/trpc'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
+import { AlertTriangle, Loader2 } from 'lucide-react'
+import { Button } from '@/components/common/Button'
+import Link from 'next/link'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!)
+// Read the public key once and validate it.
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
+  : null
 
 export default function CheckoutPage() {
   const { data: session } = useSession()
   const { items, getTotalPrice } = useCart()
   const [clientSecret, setClientSecret] = useState<string | null>(null)
 
-  const { mutate: createPaymentIntent, isPending } = api.checkout.createPaymentIntent.useMutation({
+  const {
+    mutate: createPaymentIntent,
+    isPending,
+    isError: isPaymentIntentError,
+  } = api.checkout.createPaymentIntent.useMutation({
     onSuccess: (data) => {
       setClientSecret(data.clientSecret)
     },
     onError: (error) => {
-      console.error("Failed to create payment intent:", error)
-    }
+      console.error('Failed to create payment intent:', error)
+      // The state will reflect this error, and the UI will update.
+    },
   })
 
   useEffect(() => {
+    // Only create an intent if there are items in the cart.
     if (items.length > 0) {
       createPaymentIntent({
-        cartDetails: JSON.stringify(items),
+        // The API now expects a structured array, not a JSON string.
+        cartItems: items.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+        })),
         userId: session?.user?.id,
       })
     }
   }, [items, session, createPaymentIntent])
+
+  // 1. Render an error if the public key is missing in the environment.
+  if (!stripePromise) {
+    return (
+      <div className="container my-12 text-center">
+        <h1 className="text-2xl font-bold text-destructive">Configuration Error</h1>
+        <p className="text-muted-foreground mt-2">
+          The payment gateway is not configured correctly. Please contact support.
+        </p>
+      </div>
+    )
+  }
 
   const appearance = { theme: 'stripe' as const }
   const options = clientSecret ? { clientSecret, appearance } : undefined
@@ -14321,18 +14807,34 @@ export default function CheckoutPage() {
       <div className="grid grid-cols-1 gap-x-12 lg:grid-cols-2">
         <div className="py-8">
           <h1 className="text-3xl font-bold mb-6">Checkout</h1>
-          {options ? (
+          
+          {/* 2. Handle the three possible states: loading, error, or success */}
+          {isPending && (
+            <div className="text-center p-8 border rounded-lg flex flex-col items-center justify-center h-64">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+              <p className="text-muted-foreground">Preparing your secure payment session...</p>
+            </div>
+          )}
+
+          {isPaymentIntentError && (
+            <div className="text-center p-8 border rounded-lg border-destructive/50 bg-destructive/10 text-destructive flex flex-col items-center">
+              <AlertTriangle className="h-8 w-8 mb-4" />
+              <p className="font-semibold">Could not initiate payment.</p>
+              <p className="text-sm text-destructive/80 mb-6">There was an issue connecting to our payment provider.</p>
+              <Button asChild variant="destructive">
+                <Link href="/cart">Return to Cart</Link>
+              </Button>
+            </div>
+          )}
+
+          {options && !isPending && !isPaymentIntentError && (
             <Elements options={options} stripe={stripePromise}>
               <CheckoutForm />
             </Elements>
-          ) : (
-             <div className="text-center p-8 border rounded-lg">
-                <p>Loading payment form...</p>
-             </div>
           )}
         </div>
 
-        <div className="bg-stone-100 dark:bg-charcoal p-8 rounded-lg lg:py-8">
+        <aside className="bg-stone-100 dark:bg-stone-900/50 p-8 rounded-lg lg:py-8 order-first lg:order-last">
           <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
           <div className="space-y-4">
             {items.map((item) => (
@@ -14342,7 +14844,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex-grow">
                   <p className="font-medium">{item.product.name}</p>
-                  <p className="text-sm text-muted">Qty: {item.quantity}</p>
+                  <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                 </div>
                 <p>{formatPrice(Number(item.variant.price) * item.quantity)}</p>
               </div>
@@ -14353,7 +14855,7 @@ export default function CheckoutPage() {
               <span>Subtotal</span>
               <span>{formatPrice(getTotalPrice())}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between text-sm text-muted-foreground">
               <span>Shipping</span>
               <span>Free</span>
             </div>
@@ -14362,7 +14864,7 @@ export default function CheckoutPage() {
               <span>{formatPrice(getTotalPrice())}</span>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   )
@@ -14591,52 +15093,106 @@ export default function ProductPage() {
 # app/(shop)/products/page.tsx
 ```tsx
 // app/(shop)/products/page.tsx
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+import { api } from '@/lib/api/trpc'
 import { ProductCard } from '@/components/features/product/ProductCard'
-import { appRouter } from '@/server/routers'
-import { createContext } from '@/server/context'
+import { FiltersSidebar } from '@/components/features/shop/FiltersSidebar'
+import { CategoryFilterBar } from '@/components/features/shop/CategoryFilterBar'
+import { SortDropdown } from '@/components/features/shop/SortDropdown'
+import { GenericError, ProductCardSkeleton } from '@/components/common/Skeletons'
 
-export const metadata = {
-  title: 'All Products',
-  description: 'Explore our full collection of premium, natural aromatherapy products.',
-}
+export default function ProductsPage() {
+  const searchParams = useSearchParams()
 
-// Revalidate this page every hour (3600 seconds)
-export const revalidate = 3600;
+  // Read filters from URL
+  const category = searchParams.get('category') || undefined
+  const sort = searchParams.get('sort') || 'createdAt_desc'
+  const q = searchParams.get('q') || undefined
+  const minPrice = searchParams.get('minPrice') || undefined
+  const maxPrice = searchParams.get('maxPrice') || undefined
 
-export default async function ProductsPage() {
-  const serverContext = await createContext()
-  const caller = appRouter.createCaller(serverContext)
+  const [sortBy, sortOrder] = sort.split('_') as ['createdAt' | 'price', 'asc' | 'desc']
 
-  const productListData = await caller.product.list({ limit: 12 })
+  const { data, isLoading, isError, refetch } = api.product.list.useQuery({
+    limit: 12,
+    category,
+    sortBy,
+    sortOrder,
+    q,
+    // The backend now coerces these, so we can pass them as is.
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+  })
 
-  const serializableProducts = productListData.items.map((product) => ({
-    ...product,
-    price: product.price.toNumber(),
-    variants: product.variants.map((variant) => ({
-      ...variant,
-      price: variant.price.toNumber(),
-    })),
-  }))
+  const products = data?.items || []
+  const categoryName = products[0]?.category.name || 'Products'
 
-  return (
-    <div className="container py-10">
-      <section className="mb-12 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Our Collection</h1>
-        <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-          Discover scents that soothe, uplift, and transform. Each product is crafted with the
-          purest ingredients to elevate your daily rituals.
-        </p>
-      </section>
-
-      {serializableProducts.length === 0 ? (
-        <p className="text-center text-muted-foreground">No products found. Please check back soon!</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8">
-          {serializableProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
           ))}
         </div>
-      )}
+      )
+    }
+
+    if (isError) {
+      return <GenericError onRetry={() => refetch()} />
+    }
+
+    if (products.length === 0) {
+      return (
+        <div className="text-center py-16">
+          <h3 className="text-xl font-semibold">No Products Found</h3>
+          <p className="text-muted-foreground mt-2">Try adjusting your filters.</p>
+        </div>
+      )
+    }
+
+    return (
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="container my-12">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-4 lg:gap-12">
+        <aside className="lg:col-span-1">
+          <FiltersSidebar />
+        </aside>
+
+        <main className="lg:col-span-3">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold tracking-tight">
+              {category ? categoryName : 'All Products'}
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              Discover scents that soothe, uplift, and transform.
+            </p>
+          </header>
+
+          <div className="border-b pb-4 mb-6">
+            <CategoryFilterBar />
+          </div>
+
+          <div className="flex justify-between items-center mb-6">
+            <p className="text-sm text-muted-foreground">
+              {isLoading ? 'Loading...' : `Showing ${products.length} products`}
+            </p>
+            <SortDropdown />
+          </div>
+
+          {renderContent()}
+        </main>
+      </div>
     </div>
   )
 }
@@ -15215,6 +15771,17 @@ export default async function JournalPage() {
   }
 }
 
+/* Centralized Form Input Styles */
+@layer components {
+  .input-style {
+    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .error-text {
+    @apply text-sm font-medium text-destructive mt-1;
+  }
+}
+
 ```
 
 # components/animations/FadeIn.tsx
@@ -15452,10 +16019,10 @@ export function OrderHistoryItem({ order }: OrderHistoryItemProps) {
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { shippingAddressSchema, TShippingAddressSchema } from '@/lib/validation/schemas'
-import { useStripe } from '@stripe/react-stripe-js'
-import { PaymentElement, useElements } from '@stripe/react-stripe-js'
+import { useStripe, PaymentElement, useElements } from '@stripe/react-stripe-js'
 import { useState } from 'react'
 import { Button } from '@/components/common/Button'
+import { Input } from '@/components/common/Input' // Import new component
 
 export function CheckoutForm() {
   const stripe = useStripe()
@@ -15472,17 +16039,12 @@ export function CheckoutForm() {
   })
 
   const processSubmit = async (data: TShippingAddressSchema) => {
-    if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      return
-    }
-
+    if (!stripe || !elements) return
     setIsLoading(true)
 
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // Make sure to change this to your payment completion page
         return_url: `${window.location.origin}/order-confirmation`,
         shipping: {
           name: `${data.firstName} ${data.lastName}`,
@@ -15498,9 +16060,6 @@ export function CheckoutForm() {
       },
     })
     
-    // This point will only be reached if there is an immediate error when
-    // confirming the payment. Otherwise, your customer will be redirected to
-    // your `return_url`.
     if (error.type === 'card_error' || error.type === 'validation_error') {
       setErrorMessage(error.message || 'An unexpected error occurred.')
     } else {
@@ -15517,42 +16076,41 @@ export function CheckoutForm() {
         <div className="mt-4 grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
             <div>
                 <label htmlFor="firstName">First name</label>
-                <input type="text" id="firstName" {...register('firstName')} className="input-style mt-1"/>
+                <Input type="text" id="firstName" {...register('firstName')} className="mt-1"/>
                 {errors.firstName && <p className="error-text">{errors.firstName.message}</p>}
             </div>
             <div>
                 <label htmlFor="lastName">Last name</label>
-                <input type="text" id="lastName" {...register('lastName')} className="input-style mt-1"/>
+                <Input type="text" id="lastName" {...register('lastName')} className="mt-1"/>
                 {errors.lastName && <p className="error-text">{errors.lastName.message}</p>}
             </div>
             <div className="sm:col-span-2">
                 <label htmlFor="addressLine1">Address</label>
-                <input type="text" id="addressLine1" {...register('addressLine1')} className="input-style mt-1"/>
+                <Input type="text" id="addressLine1" {...register('addressLine1')} className="mt-1"/>
                 {errors.addressLine1 && <p className="error-text">{errors.addressLine1.message}</p>}
             </div>
              <div className="sm:col-span-2">
                 <label htmlFor="addressLine2">Apartment, suite, etc. (Optional)</label>
-                <input type="text" id="addressLine2" {...register('addressLine2')} className="input-style mt-1"/>
+                <Input type="text" id="addressLine2" {...register('addressLine2')} className="mt-1"/>
             </div>
             <div>
                 <label htmlFor="city">City</label>
-                <input type="text" id="city" {...register('city')} className="input-style mt-1"/>
+                <Input type="text" id="city" {...register('city')} className="mt-1"/>
                 {errors.city && <p className="error-text">{errors.city.message}</p>}
             </div>
              <div>
                 <label htmlFor="stateProvince">State / Province</label>
-                <input type="text" id="stateProvince" {...register('stateProvince')} className="input-style mt-1"/>
+                <Input type="text" id="stateProvince" {...register('stateProvince')} className="mt-1"/>
                 {errors.stateProvince && <p className="error-text">{errors.stateProvince.message}</p>}
             </div>
             <div>
                 <label htmlFor="postalCode">Postal code</label>
-                <input type="text" id="postalCode" {...register('postalCode')} className="input-style mt-1"/>
+                <Input type="text" id="postalCode" {...register('postalCode')} className="mt-1"/>
                 {errors.postalCode && <p className="error-text">{errors.postalCode.message}</p>}
             </div>
             <div>
                 <label htmlFor="countryCode">Country</label>
-                {/* In a real app, this would be a dropdown */}
-                <input type="text" id="countryCode" {...register('countryCode')} className="input-style mt-1" defaultValue="US"/>
+                <Input type="text" id="countryCode" {...register('countryCode')} className="mt-1" defaultValue="US"/>
                 {errors.countryCode && <p className="error-text">{errors.countryCode.message}</p>}
             </div>
         </div>
@@ -16045,7 +16603,6 @@ export function RelatedProducts({ categoryId, currentProductId }: RelatedProduct
 'use client'
 
 import React, { useState } from 'react'
-import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signIn } from 'next-auth/react'
@@ -16055,7 +16612,8 @@ import { api } from '@/lib/api/trpc'
 import { Button } from '@/components/common/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/common/Card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/common/Tabs'
-import { Chrome } from 'lucide-react' // Using Chrome as a generic "Google" icon
+import { Input } from '@/components/common/Input' // Import new component
+import { Chrome } from 'lucide-react'
 
 interface AuthFormProps {
   defaultTab: 'login' | 'register'
@@ -16081,13 +16639,10 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
 
   const registerUser = api.user.register.useMutation({
     onSuccess: () => {
-      // On successful registration, switch to login tab and show a success message
       setActiveTab('login')
       resetRegisterForm()
-      // Can add a toast notification here in the future
     },
     onError: (error) => {
-      // Handle errors, e.g., user already exists
       console.error('Registration failed:', error.message)
     },
   })
@@ -16102,7 +16657,7 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
     if (result?.error) {
       setLoginError('root', { message: 'Invalid email or password.' })
     } else {
-      router.push('/account/profile') // Redirect to a protected page on success
+      router.push('/account/profile')
       router.refresh()
     }
   }
@@ -16118,7 +16673,6 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
         <TabsTrigger value="register">Create Account</TabsTrigger>
       </TabsList>
 
-      {/* Login Form */}
       <TabsContent value="login">
         <Card>
           <CardHeader>
@@ -16129,36 +16683,30 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
             <form onSubmit={handleLoginSubmit(onLoginSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="login-email">Email</label>
-                <input id="login-email" {...registerLogin('email')} className="w-full input-style" />
+                <Input id="login-email" type="email" {...registerLogin('email')} />
                 {loginErrors.email && <p className="error-text">{loginErrors.email.message}</p>}
               </div>
               <div className="space-y-2">
                 <label htmlFor="login-password">Password</label>
-                <input id="login-password" type="password" {...registerLogin('password')} className="w-full input-style" />
+                <Input id="login-password" type="password" {...registerLogin('password')} />
                 {loginErrors.password && <p className="error-text">{loginErrors.password.message}</p>}
               </div>
-              {loginErrors.root && <p className="error-text">{loginErrors.root.message}</p>}
+              {loginErrors.root && <p className="error-text text-center">{loginErrors.root.message}</p>}
               <Button type="submit" className="w-full" disabled={isLoginSubmitting}>
                 {isLoginSubmitting ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
             <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border dark:border-dark-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-limestone px-2 text-muted dark:bg-midnight dark:text-dark-muted">Or continue with</span>
-              </div>
+              <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+              <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Or continue with</span></div>
             </div>
             <Button variant="secondary" className="w-full" onClick={() => signIn('google')}>
-              <Chrome className="mr-2 h-4 w-4" />
-              Sign in with Google
+              <Chrome className="mr-2 h-4 w-4" /> Sign in with Google
             </Button>
           </CardContent>
         </Card>
       </TabsContent>
 
-      {/* Registration Form */}
       <TabsContent value="register">
         <Card>
           <CardHeader>
@@ -16170,26 +16718,26 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label htmlFor="firstName">First Name</label>
-                  <input id="firstName" {...registerRegister('firstName')} className="w-full input-style" />
+                  <Input id="firstName" {...registerRegister('firstName')} />
                   {registerErrors.firstName && <p className="error-text">{registerErrors.firstName.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="lastName">Last Name</label>
-                  <input id="lastName" {...registerRegister('lastName')} className="w-full input-style" />
+                  <Input id="lastName" {...registerRegister('lastName')} />
                   {registerErrors.lastName && <p className="error-text">{registerErrors.lastName.message}</p>}
                 </div>
               </div>
               <div className="space-y-2">
                 <label htmlFor="register-email">Email</label>
-                <input id="register-email" {...registerRegister('email')} className="w-full input-style" />
+                <Input id="register-email" type="email" {...registerRegister('email')} />
                 {registerErrors.email && <p className="error-text">{registerErrors.email.message}</p>}
               </div>
               <div className="space-y-2">
                 <label htmlFor="register-password">Password</label>
-                <input id="register-password" type="password" {...registerRegister('password')} className="w-full input-style" />
+                <Input id="register-password" type="password" {...registerRegister('password')} />
                 {registerErrors.password && <p className="error-text">{registerErrors.password.message}</p>}
               </div>
-               {registerUser.isError && <p className="error-text">{registerUser.error.message}</p>}
+              {registerUser.isError && <p className="error-text">{registerUser.error.message}</p>}
               <Button type="submit" className="w-full" disabled={isRegisterSubmitting}>
                 {isRegisterSubmitting ? 'Creating Account...' : 'Create Account'}
               </Button>
@@ -16200,10 +16748,6 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
     </Tabs>
   )
 }
-
-// Add these helper classes to app/globals.css
-// .input-style { @apply block w-full rounded-md border-0 py-1.5 px-2 text-charcoal dark:text-pearl shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sage dark:bg-charcoal dark:ring-dark-border; }
-// .error-text { @apply text-sm text-red-600 mt-1; }
 
 ```
 
@@ -16218,6 +16762,7 @@ import { newsletterSchema, TNewsletterSchema } from '@/lib/validation/schemas'
 import { api } from '@/lib/api/trpc'
 import { Button } from '@/components/common/Button'
 import { useState } from 'react'
+import { Input } from '@/components/common/Input' // Import new component
 
 export function NewsletterForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -16237,20 +16782,19 @@ export function NewsletterForm() {
       reset()
     },
     onError: (error) => {
-      // In a real app, you might show this error to the user
       console.error('Subscription failed:', error)
       setSuccessMessage('Something went wrong. Please try again.')
     },
   })
 
   const onSubmit = (data: TNewsletterSchema) => {
-    setSuccessMessage(null) // Clear previous messages
+    setSuccessMessage(null)
     subscribe.mutate(data)
   }
 
   if (successMessage) {
     return (
-      <div className="text-center p-4 bg-sage-500/10 border border-sage-500/20 rounded-md">
+      <div className="text-center p-4 bg-primary/10 border border-primary/20 rounded-md">
         <p className="font-semibold text-primary">{successMessage}</p>
       </div>
     )
@@ -16259,17 +16803,184 @@ export function NewsletterForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
       <div className="flex w-full max-w-sm items-center space-x-2">
-        <input
+        <Input
           {...register('email')}
           type="email"
           placeholder="Enter your email"
-          className="flex-1 bg-stone-900/50 border border-stone-700 px-3 py-2 text-sm rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+          // This input needs a specific style for its context in the dark footer
+          className="flex-1 bg-stone-900/50 border-stone-700 placeholder:text-stone-400 focus:ring-primary"
         />
         <Button type="submit" variant="primary" size="sm" disabled={subscribe.isPending}>
           {subscribe.isPending ? 'Subscribing...' : 'Subscribe'}
         </Button>
       </div>
-      {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+      {errors.email && <p className="error-text">{errors.email.message}</p>}
+    </form>
+  )
+}
+
+```
+
+# components/features/shop/SortDropdown.tsx
+```tsx
+// components/features/shop/SortDropdown.tsx
+'use client'
+
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { SORT_OPTIONS } from '@/lib/config/shop'
+
+export function SortDropdown() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const currentSort = searchParams.get('sort') || SORT_OPTIONS.LATEST
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const params = new URLSearchParams(searchParams)
+    params.set('sort', e.target.value)
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <label htmlFor="sort" className="text-sm text-muted-foreground">Sort by:</label>
+      <select
+        id="sort"
+        value={currentSort}
+        onChange={handleSortChange}
+        className="input-style text-sm py-1"
+      >
+        <option value={SORT_OPTIONS.LATEST}>Latest</option>
+        <option value={SORT_OPTIONS.PRICE_ASC}>Price: Low to High</option>
+        <option value={SORT_OPTIONS.PRICE_DESC}>Price: High to Low</option>
+      </select>
+    </div>
+  )
+}
+
+```
+
+# components/features/shop/CategoryFilterBar.tsx
+```tsx
+// components/features/shop/CategoryFilterBar.tsx
+'use client'
+
+import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { api } from '@/lib/api/trpc'
+import { cn } from '@/lib/utils'
+
+export function CategoryFilterBar() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const currentCategory = searchParams.get('category')
+
+  const { data: categories, isLoading } = api.product.getCategoryList.useQuery() // We'll need to create this procedure
+
+  const createQueryString = (name: string, value: string) => {
+    const params = new URLSearchParams(searchParams)
+    params.set(name, value)
+    return params.toString()
+  }
+
+  if (isLoading || !categories) {
+    return <div className="h-6 bg-stone-200 dark:bg-stone-800 rounded-md animate-pulse" />
+  }
+
+  return (
+    <nav className="flex flex-wrap gap-x-4 gap-y-2 items-center">
+      <Link
+        href={pathname}
+        className={cn('px-3 py-1 text-sm rounded-full transition-colors',
+          !currentCategory ? 'bg-primary text-primary-foreground' : 'hover:bg-accent/50'
+        )}
+      >
+        All Products
+      </Link>
+      {categories.map((cat) => (
+        <Link
+          key={cat.id}
+          href={`${pathname}?${createQueryString('category', cat.slug)}`}
+          className={cn('px-3 py-1 text-sm rounded-full transition-colors',
+            currentCategory === cat.slug ? 'bg-primary text-primary-foreground' : 'hover:bg-accent/50'
+          )}
+        >
+          {cat.name}
+        </Link>
+      ))}
+    </nav>
+  )
+}
+
+```
+
+# components/features/shop/FiltersSidebar.tsx
+```tsx
+// components/features/shop/FiltersSidebar.tsx
+'use client'
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Button } from '@/components/common/Button'
+import { Search } from 'lucide-react'
+import { Input } from '@/components/common/Input' // Using the new Input component
+
+export function FiltersSidebar() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const handleApplyFilters = (formData: FormData) => {
+    const params = new URLSearchParams(searchParams)
+    const minPrice = formData.get('minPrice') as string
+    const maxPrice = formData.get('maxPrice') as string
+    const searchQuery = formData.get('q') as string // Changed from 'searchQuery' to 'q'
+
+    if (minPrice) params.set('minPrice', minPrice)
+    else params.delete('minPrice')
+    if (maxPrice) params.set('maxPrice', maxPrice)
+    else params.delete('maxPrice')
+    if (searchQuery) params.set('q', searchQuery)
+    else params.delete('q')
+
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
+  return (
+    <form action={handleApplyFilters} className="space-y-6 sticky top-24">
+      <div>
+        <h3 className="font-semibold mb-2">Search Products</h3>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            name="q" // Changed from 'searchQuery' to 'q'
+            type="search"
+            defaultValue={searchParams.get('q') || ''}
+            placeholder="Search..."
+            className="pl-9 w-full"
+          />
+        </div>
+      </div>
+      <div>
+        <h3 className="font-semibold mb-2">Price Range</h3>
+        <div className="flex items-center gap-2">
+          <Input
+            name="minPrice"
+            type="number"
+            defaultValue={searchParams.get('minPrice') || ''}
+            placeholder="Min"
+          />
+          <span>-</span>
+          <Input
+            name="maxPrice"
+            type="number"
+            defaultValue={searchParams.get('maxPrice') || ''}
+            placeholder="Max"
+          />
+        </div>
+      </div>
+      <Button type="submit" className="w-full">
+        Apply Filters
+      </Button>
     </form>
   )
 }
@@ -16281,13 +16992,13 @@ export function NewsletterForm() {
 // components/features/journal/PostBody.tsx
 'use client'
 
-import { PortableText } from '@portabletext/react'
+import { PortableText, type PortableTextBlock } from '@portabletext/react'
 import Image from 'next/image'
-import { urlForImage } from '@/lib/cms/image' // Helper to build image URLs
+import { urlForImage } from '@/lib/cms/image'
 
 const ptComponents = {
   types: {
-    image: ({ value }: { value: any }) => {
+    image: ({ value }: { value: PortableTextBlock & { asset?: any } }) => {
       if (!value?.asset?._ref) {
         return null
       }
@@ -16306,7 +17017,7 @@ const ptComponents = {
   },
 }
 
-export function PostBody({ content }: { content: any }) {
+export function PostBody({ content }: { content: PortableTextBlock[] }) {
   return (
     <div className="prose dark:prose-invert max-w-none">
       <PortableText value={content} components={ptComponents} />
@@ -16377,6 +17088,35 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 CardFooter.displayName = 'CardFooter'
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+
+```
+
+# components/common/Input.tsx
+```tsx
+// components/common/Input.tsx
+import * as React from 'react'
+import { cn } from '@/lib/utils'
+
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          className,
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+Input.displayName = 'Input'
+
+export { Input }
 
 ```
 
@@ -16914,6 +17654,52 @@ describe('Button Component', () => {
 
 ```
 
+# components/common/Skeletons.tsx
+```tsx
+// components/common/Skeletons.tsx
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/common/Card'
+import { Button } from './Button'
+import { AlertTriangle } from 'lucide-react'
+
+/**
+ * A skeleton component that mimics the layout of a ProductCard.
+ * Used to provide a better loading state UI on the products page.
+ */
+export function ProductCardSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="p-0">
+        <div className="relative aspect-square bg-stone-200 dark:bg-stone-800 animate-pulse" />
+      </CardHeader>
+      <CardContent className="p-4">
+        <div className="h-6 w-3/4 rounded-md bg-stone-200 dark:bg-stone-800 animate-pulse" />
+        <div className="mt-3 h-7 w-1/3 rounded-md bg-stone-200 dark:bg-stone-800 animate-pulse" />
+      </CardContent>
+      <CardFooter className="p-4 pt-0">
+        <div className="h-10 w-full rounded-md bg-stone-200 dark:bg-stone-800 animate-pulse" />
+      </CardFooter>
+    </Card>
+  )
+}
+
+/**
+ * A generic error component to display when tRPC queries fail.
+ */
+export function GenericError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-16 text-destructive">
+      <AlertTriangle className="h-12 w-12 mb-4" />
+      <h3 className="text-xl font-semibold mb-2">Something Went Wrong</h3>
+      <p className="text-muted-foreground mb-6">We couldn't load the requested data. Please try again.</p>
+      <Button onClick={onRetry} variant="destructive">
+        Try Again
+      </Button>
+    </div>
+  )
+}
+
+```
+
 # components/common/Badge.tsx
 ```tsx
 // components/common/Badge.tsx
@@ -17274,6 +18060,26 @@ export const algolia = algoliasearch(
   process.env.ALGOLIA_APP_ID!,
   process.env.ALGOLIA_API_KEY!
 )
+
+```
+
+# lib/config/shop.ts
+```ts
+// lib/config/shop.ts
+
+/**
+ * Defines the available sorting options for the product list.
+ * Using a constant object ensures type safety and prevents typos,
+ * as these values are shared between the client (SortDropdown) and the server (tRPC router).
+ */
+export const SORT_OPTIONS = {
+  LATEST: 'createdAt_desc',
+  PRICE_ASC: 'price_asc',
+  PRICE_DESC: 'price_desc',
+} as const
+
+// We can infer the type directly from the object for use in other parts of the app
+export type SortOption = (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS]
 
 ```
 
@@ -18363,27 +19169,62 @@ export const journalRouter = router({
 ```ts
 // server/routers/checkout.ts
 import { z } from 'zod'
-import { router, publicProcedure } from '../trpc' // Can use protectedProcedure if login is required
+import { router, publicProcedure } from '../trpc'
 import { stripe } from '@/lib/payments/stripe'
 import { TRPCError } from '@trpc/server'
+import { prisma } from '@/lib/db/client'
 
 export const checkoutRouter = router({
   createPaymentIntent: publicProcedure
     .input(
       z.object({
-        // The cart details are now passed from the client
-        cartDetails: z.string(), // A JSON string of the cart items
-        userId: z.string().optional(), // Optional user ID for logged-in users
+        // The input is now a structured array, providing better type safety.
+        cartItems: z.array(
+          z.object({
+            id: z.string(),
+            quantity: z.number().min(1),
+          }),
+        ),
+        userId: z.string().optional(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        const cartItems = JSON.parse(input.cartDetails)
-        const amount = cartItems.reduce(
-          (total: number, item: any) =>
-            total + Number(item.variant.price) * item.quantity,
-          0,
-        )
+        const { cartItems, userId } = input
+
+        // Fetch product details from the database to ensure prices are accurate and not manipulated on the client.
+        const variantIds = cartItems.map((item) => item.id)
+        const variants = await prisma.productVariant.findMany({
+          where: { id: { in: variantIds } },
+          select: { id: true, price: true },
+        })
+
+        const amount = cartItems.reduce((total, cartItem) => {
+          const variant = variants.find((v) => v.id === cartItem.id)
+          if (!variant) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: `Invalid item in cart: Variant with ID ${cartItem.id} not found.`,
+            })
+          }
+          const priceInNumber = variant.price.toNumber()
+          return total + priceInNumber * cartItem.quantity
+        }, 0)
+
+        // Prevent creating a payment intent for a zero-value cart
+        if (amount <= 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Cannot process an empty or zero-value cart.',
+          })
+        }
+
+        // The metadata needs to be a flat object of strings.
+        // We'll stringify the cart details for the webhook.
+        const metadataForStripe = {
+          cartDetails: JSON.stringify(cartItems),
+          userId: userId || 'guest',
+        }
 
         const paymentIntent = await stripe.paymentIntents.create({
           amount: Math.round(amount * 100), // Stripe expects the amount in cents
@@ -18391,11 +19232,7 @@ export const checkoutRouter = router({
           automatic_payment_methods: {
             enabled: true,
           },
-          // Embed cart and user info for the webhook
-          metadata: {
-            cartDetails: input.cartDetails,
-            userId: input.userId || 'guest',
-          },
+          metadata: metadataForStripe,
         })
 
         if (!paymentIntent.client_secret) {
@@ -18410,6 +19247,8 @@ export const checkoutRouter = router({
         }
       } catch (error) {
         console.error('Stripe Payment Intent Error:', error)
+        // Propagate specific TRPC errors or a generic one
+        if (error instanceof TRPCError) throw error
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Could not create a payment session.',
@@ -18505,6 +19344,17 @@ export const cartRouter = router({
 import { z } from 'zod'
 import { router, publicProcedure, protectedProcedure } from '../trpc'
 import { TRPCError } from '@trpc/server'
+import { Prisma } from '@prisma/client' // Import Prisma types
+
+// Helper function to serialize product data, converting Decimal to number
+const serializeProduct = (product: any) => ({
+  ...product,
+  price: product.price.toNumber(),
+  variants: product.variants.map((variant: any) => ({
+    ...variant,
+    price: variant.price.toNumber(),
+  })),
+})
 
 export const productRouter = router({
   list: publicProcedure
@@ -18513,41 +19363,57 @@ export const productRouter = router({
         limit: z.number().min(1).max(100).default(12),
         cursor: z.string().nullish(),
         category: z.string().optional(),
-        sortBy: z.enum(['price', 'createdAt']).default('createdAt'),
+        sortBy: z.enum(['createdAt', 'price']).default('createdAt'),
         sortOrder: z.enum(['asc', 'desc']).default('desc'),
+        // Use z.coerce to automatically convert string URL params to numbers
+        minPrice: z.coerce.number().optional(),
+        maxPrice: z.coerce.number().optional(),
+        // Renamed to 'q' to match URL convention
+        q: z.string().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
+      const { limit, cursor, category, sortBy, sortOrder, minPrice, maxPrice, q } = input
+
+      // Replaced `any` with the specific Prisma type for robust type-checking
+      const whereClause: Prisma.ProductWhereInput = { isActive: true }
+
+      if (category) whereClause.category = { slug: category }
+
+      if (minPrice !== undefined || maxPrice !== undefined) {
+        whereClause.price = {}
+        if (minPrice !== undefined) whereClause.price.gte = minPrice
+        if (maxPrice !== undefined) whereClause.price.lte = maxPrice
+      }
+
+      if (q) {
+        whereClause.OR = [
+          { name: { contains: q, mode: 'insensitive' } },
+          { description: { contains: q, mode: 'insensitive' } },
+          { category: { name: { contains: q, mode: 'insensitive' } } },
+        ]
+      }
+
       const products = await ctx.prisma.product.findMany({
-        take: input.limit + 1,
-        where: {
-          isActive: true,
-          category: input.category ? { slug: input.category } : undefined,
-        },
-        cursor: input.cursor ? { id: input.cursor } : undefined,
-        orderBy: {
-          [input.sortBy]: input.sortOrder,
-        },
+        take: limit + 1,
+        where: whereClause,
+        cursor: cursor ? { id: cursor } : undefined,
+        orderBy: { [sortBy]: sortOrder },
         include: {
-          variants: {
-            orderBy: { price: 'asc' },
-            take: 1,
-          },
-          images: {
-            where: { isPrimary: true },
-            take: 1,
-          },
+          category: { select: { name: true, slug: true } },
+          variants: { orderBy: { price: 'asc' }, take: 1 },
+          images: { where: { isPrimary: true }, take: 1 },
         },
       })
 
-      let nextCursor: typeof input.cursor | undefined = undefined
-      if (products.length > input.limit) {
+      let nextCursor: typeof cursor | undefined = undefined
+      if (products.length > limit) {
         const nextItem = products.pop()
         nextCursor = nextItem!.id
       }
 
       return {
-        items: products,
+        items: products.map(serializeProduct),
         nextCursor,
       }
     }),
@@ -18560,16 +19426,7 @@ export const productRouter = router({
         include: {
           variants: true,
           images: true,
-          reviews: {
-            include: {
-              user: {
-                select: {
-                  firstName: true,
-                  avatarUrl: true,
-                },
-              },
-            },
-          },
+          reviews: { include: { user: { select: { firstName: true, avatarUrl: true } } } },
           category: true,
           brand: true,
         },
@@ -18582,31 +19439,38 @@ export const productRouter = router({
         })
       }
 
-      return product
+      return serializeProduct(product)
     }),
 
   getRelated: publicProcedure
-    .input(z.object({
-      categoryId: z.string(),
-      currentProductId: z.string(),
-    }))
+    .input(
+      z.object({
+        categoryId: z.string(),
+        currentProductId: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const products = await ctx.prisma.product.findMany({
         take: 4,
         where: {
           isActive: true,
           categoryId: input.categoryId,
-          id: {
-            not: input.currentProductId, // Exclude the current product
-          },
+          id: { not: input.currentProductId },
         },
         include: {
           variants: { orderBy: { price: 'asc' }, take: 1 },
           images: { where: { isPrimary: true }, take: 1 },
         },
-      });
-      return products;
+      })
+      return products.map(serializeProduct)
     }),
+
+  getCategoryList: publicProcedure.query(async ({ ctx }) => {
+    return ctx.prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { name: 'asc' },
+    })
+  }),
 
   create: protectedProcedure
     .input(
@@ -18616,7 +19480,7 @@ export const productRouter = router({
         sku: z.string().min(3),
         description: z.string().optional(),
         price: z.number(),
-        categoryId: z.string().uuid(),
+        categoryId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -18624,7 +19488,7 @@ export const productRouter = router({
       if (role !== 'admin' && role !== 'staff') {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
-      
+
       const product = await ctx.prisma.product.create({
         data: {
           name: input.name,
@@ -18925,6 +19789,147 @@ export interface ProductWithVariantsAndImages extends Product {
   variants: ProductVariant[]
   images: ProductImage[]
 }
+
+```
+
+# scripts/database/bulk_load_products.py
+```py
+# File: scripts/database/bulk_load_products.py
+# pip install psycopg2-binary python-dotenv
+import os
+import json
+import psycopg2
+import sys
+from decimal import Decimal
+from dotenv import load_dotenv
+from urllib.parse import urlparse
+
+# Get the project root directory
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+# Load environment variables from .env file at the project root
+load_dotenv(os.path.join(project_root, '.env'))
+
+def parse_db_url(url):
+    """Parses a database URL into a dictionary of connection parameters."""
+    result = urlparse(url)
+    return {
+        'dbname': result.path[1:],
+        'user': result.username,
+        'password': result.password,
+        'host': result.hostname,
+        'port': result.port
+    }
+
+def get_db_connection():
+    """Establishes a connection to the PostgreSQL database."""
+    try:
+        db_url = os.getenv('DATABASE_URL')
+        if not db_url:
+            raise ValueError("DATABASE_URL environment variable not set.")
+        
+        conn_params = parse_db_url(db_url)
+        conn = psycopg2.connect(**conn_params)
+        return conn
+    except Exception as e:
+        print(f"Error connecting to the database: {e}", file=sys.stderr)
+        sys.exit(1)
+
+def load_products(conn, products_data):
+    """Loads a list of products into the database transactionally."""
+    with conn.cursor() as cur:
+        for product in products_data:
+            try:
+                print(f"Processing product: {product['name']}...")
+
+                # First, ensure the category exists and get its ID
+                cur.execute(
+                    """
+                    INSERT INTO "Category" (id, name, slug, "createdAt", "updatedAt", "isActive")
+                    VALUES (gen_random_uuid(), %s, %s, NOW(), NOW(), TRUE)
+                    ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+                    RETURNING id;
+                    """,
+                    (product['category']['name'], product['category']['slug'])
+                )
+                category_id = cur.fetchone()[0]
+                print(f"  ✓ Upserted category '{product['category']['name']}' with ID: {category_id}")
+
+                # Delete existing product with the same SKU for clean import
+                cur.execute('DELETE FROM "Product" WHERE sku = %s;', (product['sku'],))
+
+                # Insert the main product record
+                cur.execute(
+                    """
+                    INSERT INTO "Product" (id, sku, name, slug, description, "shortDescription", price, "isActive", "isFeatured", "categoryId", "createdAt", "updatedAt")
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                    RETURNING id;
+                    """,
+                    (
+                        product['id'], product['sku'], product['name'], product['slug'],
+                        product.get('description', ''), product.get('shortDescription', ''),
+                        Decimal(product['price']), product.get('isActive', True),
+                        product.get('isFeatured', False), category_id
+                    )
+                )
+                product_id = cur.fetchone()[0]
+                print(f"  ✓ Inserted product with ID: {product_id}")
+
+                # Insert variants
+                for variant in product.get('variants', []):
+                    cur.execute(
+                        """
+                        INSERT INTO "ProductVariant" ("id", "productId", sku, name, price, "inventoryQuantity", "createdAt", "updatedAt")
+                        VALUES (gen_random_uuid(), %s, %s, %s, %s, %s, NOW(), NOW());
+                        """,
+                        (
+                            product_id, variant['sku'], variant['name'],
+                            Decimal(variant['price']), variant['inventoryQuantity']
+                        )
+                    )
+                print(f"  ✓ Inserted {len(product.get('variants', []))} variant(s).")
+
+                # Insert images
+                for image in product.get('images', []):
+                    cur.execute(
+                        """
+                        INSERT INTO "ProductImage" ("id", "productId", url, "altText", "isPrimary", "createdAt")
+                        VALUES (gen_random_uuid(), %s, %s, %s, %s, NOW());
+                        """,
+                        (
+                            product_id, image['url'], image.get('altText', ''),
+                            image.get('isPrimary', False)
+                        )
+                    )
+                print(f"  ✓ Inserted {len(product.get('images', []))} image(s).")
+                
+                # Commit the transaction for this product
+                conn.commit()
+                print(f"✅ Successfully loaded {product['name']}.\n")
+
+            except Exception as e:
+                print(f"❌ Error loading product '{product.get('name', 'N/A')}': {e}", file=sys.stderr)
+                conn.rollback() # Rollback the transaction for the failed product
+
+def main():
+    """Main function to run the script."""
+    json_path = os.path.join(project_root, 'bulk_load_products.json')
+    
+    if not os.path.exists(json_path):
+        print(f"Error: JSON file not found at {json_path}", file=sys.stderr)
+        sys.exit(1)
+        
+    with open(json_path, 'r') as f:
+        products_to_load = json.load(f)
+
+    conn = get_db_connection()
+    try:
+        load_products(conn, products_to_load)
+    finally:
+        conn.close()
+        print("Database connection closed.")
+
+if __name__ == '__main__':
+    main()
 
 ```
 
