@@ -1,13 +1,13 @@
 // components/features/journal/PostBody.tsx
 'use client'
 
-import { PortableText } from '@portabletext/react'
+import { PortableText, type PortableTextBlock } from '@portabletext/react'
 import Image from 'next/image'
-import { urlForImage } from '@/lib/cms/image' // Helper to build image URLs
+import { urlForImage } from '@/lib/cms/image'
 
 const ptComponents = {
   types: {
-    image: ({ value }: { value: any }) => {
+    image: ({ value }: { value: PortableTextBlock & { asset?: any } }) => {
       if (!value?.asset?._ref) {
         return null
       }
@@ -26,7 +26,7 @@ const ptComponents = {
   },
 }
 
-export function PostBody({ content }: { content: any }) {
+export function PostBody({ content }: { content: PortableTextBlock[] }) {
   return (
     <div className="prose dark:prose-invert max-w-none">
       <PortableText value={content} components={ptComponents} />

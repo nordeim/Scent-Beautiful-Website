@@ -2,12 +2,13 @@
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { SORT_OPTIONS } from '@/lib/config/shop'
 
 export function SortDropdown() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const currentSort = searchParams.get('sort') || 'createdAt_desc'
+  const currentSort = searchParams.get('sort') || SORT_OPTIONS.LATEST
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const params = new URLSearchParams(searchParams)
@@ -24,9 +25,9 @@ export function SortDropdown() {
         onChange={handleSortChange}
         className="input-style text-sm py-1"
       >
-        <option value="createdAt_desc">Latest</option>
-        <option value="price_asc">Price: Low to High</option>
-        <option value="price_desc">Price: High to Low</option>
+        <option value={SORT_OPTIONS.LATEST}>Latest</option>
+        <option value={SORT_OPTIONS.PRICE_ASC}>Price: Low to High</option>
+        <option value={SORT_OPTIONS.PRICE_DESC}>Price: High to Low</option>
       </select>
     </div>
   )

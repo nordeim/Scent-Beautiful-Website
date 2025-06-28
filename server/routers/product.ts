@@ -2,6 +2,7 @@
 import { z } from 'zod'
 import { router, publicProcedure, protectedProcedure } from '../trpc'
 import { TRPCError } from '@trpc/server'
+import { Prisma } from '@prisma/client' // Import Prisma types
 
 // Helper function to serialize product data, converting Decimal to number
 const serializeProduct = (product: any) => ({
@@ -11,7 +12,7 @@ const serializeProduct = (product: any) => ({
     ...variant,
     price: variant.price.toNumber(),
   })),
-});
+})
 
 export const productRouter = router({
   list: publicProcedure
@@ -22,28 +23,35 @@ export const productRouter = router({
         category: z.string().optional(),
         sortBy: z.enum(['createdAt', 'price']).default('createdAt'),
         sortOrder: z.enum(['asc', 'desc']).default('desc'),
-        minPrice: z.number().optional(),
-        maxPrice: z.number().optional(),
-        searchQuery: z.string().optional(),
+        // Use z.coerce to automatically convert string URL params to numbers
+        minPrice: z.coerce.number().optional(),
+        maxPrice: z.coerce.number().optional(),
+        // Renamed to 'q' to match URL convention
+        q: z.string().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const { limit, cursor, category, sortBy, sortOrder, minPrice, maxPrice, searchQuery } = input
-      
-      const whereClause: any = { isActive: true };
-      if (category) whereClause.category = { slug: category };
+      const { limit, cursor, category, sortBy, sortOrder, minPrice, maxPrice, q } = input
+
+      // Replaced `any` with the specific Prisma type for robust type-checking
+      const whereClause: Prisma.ProductWhereInput = { isActive: true }
+
+      if (category) whereClause.category = { slug: category }
+
       if (minPrice !== undefined || maxPrice !== undefined) {
-        whereClause.price = {};
-        if (minPrice !== undefined) whereClause.price.gte = minPrice;
-        if (maxPrice !== undefined) whereClause.price.lte = maxPrice;
+        whereClause.price = {}
+        if (minPrice !== undefined) whereClause.price.gte = minPrice
+        if (maxPrice !== undefined) whereClause.price.lte = maxPrice
       }
-      if (searchQuery) {
+
+      if (q) {
         whereClause.OR = [
-          { name: { contains: searchQuery, mode: 'insensitive' } },
-          { description: { contains: searchQuery, mode: 'insensitive' } },
-        ];
+          { name: { contains: q, mode: 'insensitive' } },
+          { description: { contains: q, mode: 'insensitive' } },
+          { category: { name: { contains: q, mode: 'insensitive' } } },
+        ]
       }
-      
+
       const products = await ctx.prisma.product.findMany({
         take: limit + 1,
         where: whereClause,
@@ -89,14 +97,16 @@ export const productRouter = router({
         })
       }
 
-      return serializeProduct(product);
+      return serializeProduct(product)
     }),
 
   getRelated: publicProcedure
-    .input(z.object({
-      categoryId: z.string(),
-      currentProductId: z.string(),
-    }))
+    .input(
+      z.object({
+        categoryId: z.string(),
+        currentProductId: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const products = await ctx.prisma.product.findMany({
         take: 4,
@@ -109,17 +119,16 @@ export const productRouter = router({
           variants: { orderBy: { price: 'asc' }, take: 1 },
           images: { where: { isPrimary: true }, take: 1 },
         },
-      });
-      return products.map(serializeProduct);
-    }),
-  
-  getCategoryList: publicProcedure
-    .query(async ({ ctx }) => {
-      return ctx.prisma.category.findMany({
-        where: { isActive: true },
-        orderBy: { name: 'asc' },
       })
+      return products.map(serializeProduct)
     }),
+
+  getCategoryList: publicProcedure.query(async ({ ctx }) => {
+    return ctx.prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { name: 'asc' },
+    })
+  }),
 
   create: protectedProcedure
     .input(
@@ -129,7 +138,7 @@ export const productRouter = router({
         sku: z.string().min(3),
         description: z.string().optional(),
         price: z.number(),
-        categoryId: z.string().uuid(),
+        categoryId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -137,7 +146,7 @@ export const productRouter = router({
       if (role !== 'admin' && role !== 'staff') {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
-      
+
       const product = await ctx.prisma.product.create({
         data: {
           name: input.name,
@@ -150,4 +159,4 @@ export const productRouter = router({
       })
       return product
     }),
-});
+})

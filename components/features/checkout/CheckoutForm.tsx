@@ -4,10 +4,10 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { shippingAddressSchema, TShippingAddressSchema } from '@/lib/validation/schemas'
-import { useStripe } from '@stripe/react-stripe-js'
-import { PaymentElement, useElements } from '@stripe/react-stripe-js'
+import { useStripe, PaymentElement, useElements } from '@stripe/react-stripe-js'
 import { useState } from 'react'
 import { Button } from '@/components/common/Button'
+import { Input } from '@/components/common/Input' // Import new component
 
 export function CheckoutForm() {
   const stripe = useStripe()
@@ -24,17 +24,12 @@ export function CheckoutForm() {
   })
 
   const processSubmit = async (data: TShippingAddressSchema) => {
-    if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      return
-    }
-
+    if (!stripe || !elements) return
     setIsLoading(true)
 
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // Make sure to change this to your payment completion page
         return_url: `${window.location.origin}/order-confirmation`,
         shipping: {
           name: `${data.firstName} ${data.lastName}`,
@@ -50,9 +45,6 @@ export function CheckoutForm() {
       },
     })
     
-    // This point will only be reached if there is an immediate error when
-    // confirming the payment. Otherwise, your customer will be redirected to
-    // your `return_url`.
     if (error.type === 'card_error' || error.type === 'validation_error') {
       setErrorMessage(error.message || 'An unexpected error occurred.')
     } else {
@@ -69,42 +61,41 @@ export function CheckoutForm() {
         <div className="mt-4 grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
             <div>
                 <label htmlFor="firstName">First name</label>
-                <input type="text" id="firstName" {...register('firstName')} className="input-style mt-1"/>
+                <Input type="text" id="firstName" {...register('firstName')} className="mt-1"/>
                 {errors.firstName && <p className="error-text">{errors.firstName.message}</p>}
             </div>
             <div>
                 <label htmlFor="lastName">Last name</label>
-                <input type="text" id="lastName" {...register('lastName')} className="input-style mt-1"/>
+                <Input type="text" id="lastName" {...register('lastName')} className="mt-1"/>
                 {errors.lastName && <p className="error-text">{errors.lastName.message}</p>}
             </div>
             <div className="sm:col-span-2">
                 <label htmlFor="addressLine1">Address</label>
-                <input type="text" id="addressLine1" {...register('addressLine1')} className="input-style mt-1"/>
+                <Input type="text" id="addressLine1" {...register('addressLine1')} className="mt-1"/>
                 {errors.addressLine1 && <p className="error-text">{errors.addressLine1.message}</p>}
             </div>
              <div className="sm:col-span-2">
                 <label htmlFor="addressLine2">Apartment, suite, etc. (Optional)</label>
-                <input type="text" id="addressLine2" {...register('addressLine2')} className="input-style mt-1"/>
+                <Input type="text" id="addressLine2" {...register('addressLine2')} className="mt-1"/>
             </div>
             <div>
                 <label htmlFor="city">City</label>
-                <input type="text" id="city" {...register('city')} className="input-style mt-1"/>
+                <Input type="text" id="city" {...register('city')} className="mt-1"/>
                 {errors.city && <p className="error-text">{errors.city.message}</p>}
             </div>
              <div>
                 <label htmlFor="stateProvince">State / Province</label>
-                <input type="text" id="stateProvince" {...register('stateProvince')} className="input-style mt-1"/>
+                <Input type="text" id="stateProvince" {...register('stateProvince')} className="mt-1"/>
                 {errors.stateProvince && <p className="error-text">{errors.stateProvince.message}</p>}
             </div>
             <div>
                 <label htmlFor="postalCode">Postal code</label>
-                <input type="text" id="postalCode" {...register('postalCode')} className="input-style mt-1"/>
+                <Input type="text" id="postalCode" {...register('postalCode')} className="mt-1"/>
                 {errors.postalCode && <p className="error-text">{errors.postalCode.message}</p>}
             </div>
             <div>
                 <label htmlFor="countryCode">Country</label>
-                {/* In a real app, this would be a dropdown */}
-                <input type="text" id="countryCode" {...register('countryCode')} className="input-style mt-1" defaultValue="US"/>
+                <Input type="text" id="countryCode" {...register('countryCode')} className="mt-1" defaultValue="US"/>
                 {errors.countryCode && <p className="error-text">{errors.countryCode.message}</p>}
             </div>
         </div>

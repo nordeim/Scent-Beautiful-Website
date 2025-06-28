@@ -4,6 +4,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/common/Button'
 import { Search } from 'lucide-react'
+import { Input } from '@/components/common/Input' // Using the new Input component
 
 export function FiltersSidebar() {
   const router = useRouter()
@@ -14,7 +15,7 @@ export function FiltersSidebar() {
     const params = new URLSearchParams(searchParams)
     const minPrice = formData.get('minPrice') as string
     const maxPrice = formData.get('maxPrice') as string
-    const searchQuery = formData.get('searchQuery') as string
+    const searchQuery = formData.get('q') as string // Changed from 'searchQuery' to 'q'
 
     if (minPrice) params.set('minPrice', minPrice)
     else params.delete('minPrice')
@@ -32,32 +33,30 @@ export function FiltersSidebar() {
         <h3 className="font-semibold mb-2">Search Products</h3>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            name="searchQuery"
+          <Input
+            name="q" // Changed from 'searchQuery' to 'q'
             type="search"
             defaultValue={searchParams.get('q') || ''}
             placeholder="Search..."
-            className="input-style pl-9 w-full"
+            className="pl-9 w-full"
           />
         </div>
       </div>
       <div>
         <h3 className="font-semibold mb-2">Price Range</h3>
         <div className="flex items-center gap-2">
-          <input
+          <Input
             name="minPrice"
             type="number"
             defaultValue={searchParams.get('minPrice') || ''}
             placeholder="Min"
-            className="input-style w-full"
           />
           <span>-</span>
-          <input
+          <Input
             name="maxPrice"
             type="number"
             defaultValue={searchParams.get('maxPrice') || ''}
             placeholder="Max"
-            className="input-style w-full"
           />
         </div>
       </div>
