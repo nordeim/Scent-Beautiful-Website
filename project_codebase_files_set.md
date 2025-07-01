@@ -165,8 +165,8 @@ EMAIL_FROM="noreply@thescent.com"
 
 # --- Stripe (Payments) ---
 # Get these from your Stripe Dashboard: https://dashboard.stripe.com/apikeys
-STRIPE_PUBLIC_KEY="pk_test_51RLNNX4axRnYhkNVHz16qi7Gq4UnX5LDalYvXf3lIqneXziRQFrzrk0e4dMyBqaKQ8IxmJhSqtpiApC2TaBcIQqS00NJG40ELn"
-STRIPE_SECRET_KEY="sk_test_51RLNNX4axRnYhkNVVM6I6jESZEGNKiI6ALCYm5dEzDLqqA17H0BkTz2Jvq3I3jmeBEFmUDN73AKKiL1Dj5omE2iJ00yutlxS1C"
+STRIPE_PUBLIC_KEY="pk_test_REPLACE_WITH_YOUR_STRIPE_PUBLIC_KEY"
+STRIPE_SECRET_KEY="sk_test_REPLACE_WITH_YOUR_STRIPE_SECRET_KEY"
 STRIPE_WEBHOOK_SECRET="whsec_REPLACE_WITH_YOUR_STRIPE_WEBHOOK_SECRET"
 
 # --- SendGrid (Transactional Emails) ---
