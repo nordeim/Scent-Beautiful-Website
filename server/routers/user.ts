@@ -1,13 +1,16 @@
 // server/routers/user.ts
 import { z } from 'zod'
 import { router, publicProcedure, protectedProcedure } from '../trpc'
-import { hash } from 'bcryptjs'
+import { hash, compare } from 'bcryptjs'
 import { TRPCError } from '@trpc/server'
-import { registerSchema } from '@/lib/validation/schemas'
+import { registerSchema, profileSchema, passwordChangeSchema } from '@/lib/validation/schemas'
 
 export const userRouter = router({
   me: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.session?.user
+    // Fetch the full user object for the profile page
+    return ctx.prisma.user.findUnique({
+      where: { id: ctx.session.user.id },
+    })
   }),
 
   register: publicProcedure.input(registerSchema).mutation(async ({ ctx, input }) => {
@@ -35,8 +38,51 @@ export const userRouter = router({
       },
     })
 
-    // Omitting password hash from the returned object
     const { passwordHash, ...userWithoutPassword } = newUser
     return userWithoutPassword
   }),
+
+  updateProfile: protectedProcedure
+    .input(profileSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { firstName, lastName } = input
+      const userId = ctx.session.user.id
+
+      const updatedUser = await ctx.prisma.user.update({
+        where: { id: userId },
+        data: { firstName, lastName },
+      })
+
+      return updatedUser
+    }),
+
+  updatePassword: protectedProcedure
+    .input(passwordChangeSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { currentPassword, newPassword } = input
+      const userId = ctx.session.user.id
+
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: userId },
+      })
+
+      if (!user || !user.passwordHash) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found.' })
+      }
+
+      const isPasswordValid = await compare(currentPassword, user.passwordHash)
+
+      if (!isPasswordValid) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Incorrect current password.' })
+      }
+
+      const newHashedPassword = await hash(newPassword, 12)
+
+      await ctx.prisma.user.update({
+        where: { id: userId },
+        data: { passwordHash: newHashedPassword },
+      })
+
+      return { success: true, message: 'Password updated successfully.' }
+    }),
 })

@@ -1,38 +1,33 @@
 // app/account/profile/page.tsx
-import { createContext } from '@/server/context'
-import { appRouter } from '@/server/routers'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/common/Card'
+'use client'
 
-export const metadata = {
-  title: 'My Profile',
-}
+import { api } from '@/lib/api/trpc'
+import { UpdateProfileForm } from '@/components/features/account/UpdateProfileForm'
+import { UpdatePasswordForm } from '@/components/features/account/UpdatePasswordForm'
+import { ManageAddresses } from '@/components/features/account/ManageAddresses'
 
-export default async function ProfilePage() {
-  const serverContext = await createContext()
-  const caller = appRouter.createCaller(serverContext)
+export default function ProfilePage() {
+  const { data: user, isLoading } = api.user.me.useQuery()
 
-  // The 'me' procedure is protected, ensuring only logged-in users can access it.
-  const user = await caller.user.me()
+  if (isLoading) {
+    return <div className="container my-12">Loading your profile...</div>
+  }
+
+  if (!user) {
+    // This case should be handled by middleware, but as a fallback:
+    return <div className="container my-12">Please log in to view your profile.</div>
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>My Profile</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-col">
-          <span className="text-sm text-muted-foreground">Full Name</span>
-          <span>{`${user?.firstName || ''} ${user?.lastName || ''}`}</span>
-        </div>
-        <div className="flex flex-col">
-          <span className="text-sm text-muted-foreground">Email</span>
-          <span>{user?.email}</span>
-        </div>
-        <div className="flex flex-col">
-          <span className="text-sm text-muted-foreground">Role</span>
-          <span className="capitalize">{user?.role}</span>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold">Profile Settings</h1>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <UpdateProfileForm user={user} />
+        <UpdatePasswordForm />
+      </div>
+
+      <ManageAddresses />
+    </div>
   )
 }

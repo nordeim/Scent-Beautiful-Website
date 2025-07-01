@@ -2,7 +2,7 @@
 import { z } from 'zod'
 import { router, publicProcedure, protectedProcedure } from '../trpc'
 import { TRPCError } from '@trpc/server'
-import { Prisma } from '@prisma/client' // Import Prisma types
+import { Prisma } from '@prisma/client'
 
 // Helper function to serialize product data, converting Decimal to number
 const serializeProduct = (product: any) => ({
@@ -23,17 +23,13 @@ export const productRouter = router({
         category: z.string().optional(),
         sortBy: z.enum(['createdAt', 'price']).default('createdAt'),
         sortOrder: z.enum(['asc', 'desc']).default('desc'),
-        // Use z.coerce to automatically convert string URL params to numbers
         minPrice: z.coerce.number().optional(),
         maxPrice: z.coerce.number().optional(),
-        // Renamed to 'q' to match URL convention
         q: z.string().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
       const { limit, cursor, category, sortBy, sortOrder, minPrice, maxPrice, q } = input
-
-      // Replaced `any` with the specific Prisma type for robust type-checking
       const whereClause: Prisma.ProductWhereInput = { isActive: true }
 
       if (category) whereClause.category = { slug: category }
@@ -74,6 +70,30 @@ export const productRouter = router({
         items: products.map(serializeProduct),
         nextCursor,
       }
+    }),
+
+  // NEW PROCEDURE for fetching featured products for the homepage
+  getFeatured: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(12).default(6),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const products = await ctx.prisma.product.findMany({
+        take: input.limit,
+        where: {
+          isActive: true,
+          isFeatured: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          category: { select: { name: true, slug: true } },
+          variants: { orderBy: { price: 'asc' }, take: 1 },
+          images: { where: { isPrimary: true }, take: 1 },
+        },
+      })
+      return products.map(serializeProduct)
     }),
 
   bySlug: publicProcedure
