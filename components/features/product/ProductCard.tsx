@@ -24,7 +24,8 @@ export function ProductCard({
   aspectRatio = 'aspect-[4/5]',
   priority = false,
 }: ProductCardProps) {
-  const { addItem } = useCart()
+  // Destructure setDrawerOpen from the useCart hook
+  const { addItem, setDrawerOpen } = useCart()
   const primaryImage = product.images?.[0]
   const primaryVariant = product.variants?.[0]
   const displayPrice = primaryVariant?.price ?? product.price
@@ -56,6 +57,9 @@ export function ProductCard({
         altText: primaryImage?.altText,
       },
     })
+    
+    // ENHANCEMENT: Open the cart drawer for immediate user feedback.
+    setDrawerOpen(true)
   }
 
   return (

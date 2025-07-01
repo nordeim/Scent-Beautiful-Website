@@ -10,11 +10,11 @@ interface FeaturedProductsProps {
 }
 
 export function FeaturedProducts({ products }: FeaturedProductsProps) {
-  // The layout now expects exactly 4 products for a 2x2 grid.
-  if (products.length < 4) {
-    // Return null or a fallback if not enough products are featured.
-    return null 
+  if (products.length < 3) {
+    return null
   }
+
+  const [heroProduct, ...otherProducts] = products
 
   return (
     <section className="py-20 bg-stone-100 dark:bg-stone-900/50" id="featured-products">
@@ -28,18 +28,25 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           </p>
         </FadeIn>
         
-        {/* REFACTORED: A simple 2x2 grid for a symmetrical layout. */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
-          {products.slice(0, 4).map((product, index) => (
-            <FadeIn key={product.id} yOffset={40} delay={index * 0.1}>
-              <ProductCard
-                product={product}
-                // Use a consistent aspect ratio for a uniform grid look.
-                aspectRatio="aspect-square"
-                priority={index < 2} // Prioritize loading images for the first two items.
-              />
-            </FadeIn>
-          ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+          {/* Hero Product - Left Column */}
+          <FadeIn yOffset={40}>
+            <ProductCard
+              product={heroProduct}
+              aspectRatio="aspect-square md:aspect-[4/5]"
+              className="h-full"
+              priority
+            />
+          </FadeIn>
+
+          {/* Stacked Side Products - Right Column */}
+          <div className="flex flex-col gap-6 lg:gap-8">
+            {otherProducts.slice(0, 2).map((product, index) => (
+              <FadeIn key={product.id} yOffset={40} delay={(index + 1) * 0.1}>
+                <ProductCard product={product} aspectRatio="aspect-video sm:aspect-[2/1] lg:aspect-[16/7]" />
+              </FadeIn>
+            ))}
+          </div>
         </div>
 
         <FadeIn className="mt-12 text-center" yOffset={40}>
