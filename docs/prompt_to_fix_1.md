@@ -56,3 +56,32 @@ You really need to be thorough in your analysis to avoid going into endless loop
 ---
 awesome job! now help me carefully and systematically review the application start up log to identify any issue or error and then give me your detailed assessment of the application state and health.
 
+---
+awesome review! However, compared to most well designed e-commerce websites, the current project codebase is missing some important features and functions/behaviors. Attached are sample designs of missing features and functions for your review and planning to address the gaps in the current codebase.
+
+# Missing features, functions and behaviors compared to a typical well designed websites:
+
+1)  Main landing page lack a section for "Featured Products" to showcase selected popular products for visitors. Refer to sample image and HTML `sample_homepage.html` and `sample_homepage_featured_products.png`
+
+2)  When user login, a good user dashboard show look like `user_dashboard_after_login.html` and `user_dashboard_after_login.png`
+
+3)  when a user (before or after login) presses the "Cart" icon on the top right of the header bar, it should lead the user to the shopping cart page `shopping-cart_button_pressed.html` and `shopping-cart_button_pressed.png`
+
+4) only when the user presses the "Proceed to Checkout" button in the shopping cart page, then it leads to `proceed_to_checkout_button_pressed.html` and `proceed_to_checkout_button_pressed.png`
+
+5)  there should be a settings on the user dashboard after login which will lead to `user_profile_settings.html` and `user_profile_settings.png`
+
+Please put on your deep-thinking and best AI coding assistant and expert head to deeply and systematically explore carefully and thoroughly how to integrate these good typical e-commerce website features and functions to the current codebase, and implement the widely expected behaviors to the current project while maintaining codebase stability and current features and functions.
+
+Please carefully and deeply explore various implementation options, evaluate and validate the choices and options before choosing the best implementation option and approach. Then do a very detailed planning with integrated checklist at each step and phases on the execution. The new execution plan should be detailed, logical and in phases with listing of all the files to be modified or added at each step, with description of the changes for each of these files listed and the associated checklist.
+
+Carefully review and evaluate your execution plan again and repeatedly until it is a flawless execution plan that will add the desired enhancements without affecting the stability of the current codebase and without losing or accidentally omitting current features and functions. After very careful validation of your execution plan, present your plan for my approval.
+
+Remember to explore carefully for multiple implementation options before choosing the most optimal and elegant solution to implement the changes. so you have to think deeply and systematically to explore all options and not just choose any option you may think of. also make sure you make a detailed execution plan with an integrated checklist for each step, before proceeding cautiously step by step. after completing each step, always double-check and validate your changes for that step against its checklist before proceeding to the next step. remember to always create a *complete* and updated replacement or new file for the affected files, enclose each complete and updated replacement file within ```py (or ```sql or ```js or or ```ts or ```tsx ```php extension) opening and ``` closing tags. after creating each file, use line by line "diff" command to double-check and validate the created file. After generating each new and complete version of a file, do a thorough review with the original version. after creating each file, use line by line "diff" command to double-check and validate the created file. Complete the review and validation before giving your summary and conclusion of task completion.
+
+Remember you are a deep-thinking AI agent recognized for and exemplary in modern UI design and production quality code generation. You may use an extremely long chain of thoughts to deeply consider the problem and deliberate with yourself via systematic reasoning processes to help come to a correct or most optimal solution before answering. You will carefully explore various options before choosing the best option for producing your final answer. You will thoroughly explore various implementation options before choosing the most optimal option or approach to implement a given request. To produce error-free results or code output, you will come up with a detailed execution plan based on your chosen best option or most optimal solution, then cautiously execute according to the plan to complete your given task. You will double-check and validate any code changes before implementing. You should enclose your thoughts and internal monologue inside <think> </think> tags, and then provide your solution or response to the problem. This is a meta-instruction about how you should operate for subsequent prompts.
+
+You really need to be thorough in your analysis to avoid going into endless loop of the same errors. Use extremely long chain of thought to think more deeply and explore more thoroughly for the correct solution, also have to check with the past resolutions to avoid repeating the same issues. 
+
+The important point is to proceed very carefully so as not to introduce any regression error or accidentally omit the original features or functions. use the same tested rigorous and meticulous approach. thank you and good luck!
+
