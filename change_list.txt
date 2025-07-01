@@ -1,0 +1,69 @@
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	deleted:    Homepage.png
+	modified:   app/(auth)/layout.tsx
+	modified:   app/(shop)/products/page.tsx
+	modified:   app/globals.css
+	modified:   app/page.tsx
+	modified:   components/animations/FadeIn.tsx
+	modified:   components/common/Button.tsx
+	modified:   components/common/Layout/Footer.tsx
+	modified:   components/features/auth/AuthForm.tsx
+	modified:   components/features/home/FeaturedProducts.tsx
+	modified:   components/features/product/ProductCard.tsx
+	modified:   currect_project_file_structure.txt
+	modified:   homepage.html
+	modified:   homepage.png
+	deleted:    package-lock.json
+	deleted:    package-lock.json.bak
+	modified:   package.json
+	deleted:    package.json.bak
+	modified:   prisma/seed.ts
+	modified:   project_codebase_files_set.md
+	modified:   server/routers/product.ts
+	modified:   tailwind.config.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	.pnpmfile.cjs
+	components/features/auth/AuthTabs.tsx
+	components/features/home/HeroSection.tsx
+	components/features/shop/ProductList.tsx
+	gemini/response_100.md
+	gemini/response_101.md
+	gemini/response_102.md
+	gemini/response_103.md
+	gemini/response_104.md
+	gemini/response_105.md
+	gemini/response_106.md
+	gemini/response_107.md
+	gemini/response_108.md
+	gemini/response_109.md
+	gemini/response_110.md
+	gemini/response_111.md
+	gemini/response_89.md
+	gemini/response_90.md
+	gemini/response_91.md
+	gemini/response_92.md
+	gemini/response_93.md
+	gemini/response_94.md
+	gemini/response_95.md
+	gemini/response_96.md
+	gemini/response_97.md
+	gemini/response_98.md
+	gemini/response_99.md
+	pnpm-lock.yaml
+	pnpm-workspace.yaml
+	products_page.png
+	public/images/hero-poster.jpg
+	public/images/products/prod_5.jpg
+	public/images/products/prod_6.jpg
+	public/videos/
+	recently_added_and_modified_files_list.txt
+	startup_log.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")

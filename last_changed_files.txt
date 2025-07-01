@@ -1,0 +1,4 @@
+server/routers/product.ts
+components/common/Button.tsx
+components/features/home/FeaturedProducts.tsx
+components/features/product/ProductCard.tsx
