@@ -8,22 +8,23 @@ interface FadeInProps {
   duration?: number
   delay?: number
   className?: string
+  yOffset?: number
 }
 
-const fadeInVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0 },
-}
+export function FadeIn({ children, duration = 0.6, delay = 0, className, yOffset = 20 }: FadeInProps) {
+  const fadeInVariants: Variants = {
+    hidden: { opacity: 0, y: yOffset },
+    visible: { opacity: 1, y: 0 },
+  }
 
-export function FadeIn({ children, duration = 0.5, delay = 0, className }: FadeInProps) {
   return (
     <motion.div
       className={className}
       variants={fadeInVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true }}
-      transition={{ duration, delay, ease: 'easeInOut' }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration, delay, ease: 'easeOut' }}
     >
       {children}
     </motion.div>

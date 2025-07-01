@@ -28,11 +28,9 @@ export function Footer() {
   ]
 
   return (
-    <footer className="bg-stone-800 text-stone-300 border-t border-stone-700">
+    <footer className="bg-stone-900 text-stone-300 border-t border-stone-800">
       <div className="container py-16">
-        {/* Main Footer Grid */}
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
-          {/* About Section */}
           <div className="space-y-4">
             <h3 className="font-heading text-2xl font-semibold text-stone-50">The Scent</h3>
             <p className="text-sm text-stone-400">
@@ -48,7 +46,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Shop & Help Links */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-stone-50">Shop</h3>
             <ul className="space-y-2">
@@ -74,37 +71,17 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Contact & Newsletter */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-stone-50">Stay Connected</h3>
             <p className="text-sm text-stone-400">
               Join our newsletter for exclusive offers, new products, and wellness tips.
             </p>
             <NewsletterForm />
-            
-            {/* Contact Info Block - RESTORED */}
-            <div className="pt-4 mt-4 border-t border-stone-700/50">
-              <ul className="space-y-2 text-sm text-stone-400">
-                <li className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 mt-1 flex-shrink-0" />
-                  <span>123 Aromatherapy Lane, Wellness City, WB 12345</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 flex-shrink-0" />
-                  <span>+1 (555) 123-4567</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 flex-shrink-0" />
-                  <span>hello@thescent.com</span>
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Footer */}
-      <div className="border-t border-stone-700/50">
+      <div className="border-t border-stone-800">
         <div className="container flex flex-col items-center justify-between gap-4 py-6 text-sm md:flex-row">
           <p className="text-stone-500">&copy; {new Date().getFullYear()} The Scent. All Rights Reserved.</p>
           <div className="flex items-center gap-3 text-stone-500">

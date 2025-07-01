@@ -4,7 +4,6 @@ import { router, publicProcedure, protectedProcedure } from '../trpc'
 import { TRPCError } from '@trpc/server'
 import { Prisma } from '@prisma/client'
 
-// Helper function to serialize product data, converting Decimal to number
 const serializeProduct = (product: any) => ({
   ...product,
   price: product.price.toNumber(),
@@ -15,6 +14,7 @@ const serializeProduct = (product: any) => ({
 })
 
 export const productRouter = router({
+  // ... (list, bySlug, etc. procedures remain unchanged)
   list: publicProcedure
     .input(
       z.object({
@@ -72,11 +72,11 @@ export const productRouter = router({
       }
     }),
 
-  // NEW PROCEDURE for fetching featured products for the homepage
   getFeatured: publicProcedure
     .input(
       z.object({
-        limit: z.number().min(1).max(12).default(6),
+        // Updated limit for the new 1 + 2 layout
+        limit: z.number().min(1).max(12).default(3),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -179,4 +179,4 @@ export const productRouter = router({
       })
       return product
     }),
-})
+});

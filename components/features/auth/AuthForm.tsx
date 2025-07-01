@@ -10,8 +10,9 @@ import { TLoginSchema, TRegisterSchema, loginSchema, registerSchema } from '@/li
 import { api } from '@/lib/api/trpc'
 import { Button } from '@/components/common/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/common/Card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/common/Tabs'
-import { Input } from '@/components/common/Input' // Import new component
+// Import the new, dedicated AuthTabs components
+import { AuthTabs, AuthTabsContent, AuthTabsList, AuthTabsTrigger } from '@/components/features/auth/AuthTabs'
+import { Input } from '@/components/common/Input'
 import { Chrome } from 'lucide-react'
 
 interface AuthFormProps {
@@ -56,7 +57,7 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
     if (result?.error) {
       setLoginError('root', { message: 'Invalid email or password.' })
     } else {
-      router.push('/account/profile')
+      router.push('/account/dashboard') // Go to dashboard on successful login
       router.refresh()
     }
   }
@@ -66,13 +67,13 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
   }
 
   return (
-    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full max-w-md">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="login">Sign In</TabsTrigger>
-        <TabsTrigger value="register">Create Account</TabsTrigger>
-      </TabsList>
+    <AuthTabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full max-w-md">
+      <AuthTabsList>
+        <AuthTabsTrigger value="login">Sign In</AuthTabsTrigger>
+        <AuthTabsTrigger value="register">Create Account</AuthTabsTrigger>
+      </AuthTabsList>
 
-      <TabsContent value="login">
+      <AuthTabsContent value="login">
         <Card>
           <CardHeader>
             <CardTitle>Welcome Back</CardTitle>
@@ -104,9 +105,9 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
             </Button>
           </CardContent>
         </Card>
-      </TabsContent>
+      </AuthTabsContent>
 
-      <TabsContent value="register">
+      <AuthTabsContent value="register">
         <Card>
           <CardHeader>
             <CardTitle>Create an Account</CardTitle>
@@ -143,7 +144,7 @@ export function AuthForm({ defaultTab }: AuthFormProps) {
             </form>
           </CardContent>
         </Card>
-      </TabsContent>
-    </Tabs>
+      </AuthTabsContent>
+    </AuthTabs>
   )
 }

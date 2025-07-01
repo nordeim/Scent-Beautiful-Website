@@ -5,61 +5,61 @@
 
 @layer base {
   :root {
-    /* Day Theme - Graphite Light - HSL Values */
-    --background: 0 0% 96.1%;      /* stone-100 */
-    --foreground: 20 14.3% 15.1%;  /* stone-800 */
+    /* Day Theme - "Graphite & Sage" Light */
+    --background: 240 10% 98%;      /* stone-50 */
+    --foreground: 20 14.3% 9.5%;   /* stone-900 */
     
-    --card: 0 0% 96.1%;
-    --card-foreground: 20 14.3% 15.1%;
+    --card: 240 10% 98%;
+    --card-foreground: 20 14.3% 9.5%;
     
-    --primary: 158 83% 34%;      /* sage-600 */
-    --primary-foreground: 158 83% 97.1%; /* sage-50 */
+    --primary: 142 71% 40%;        /* sage-600 */
+    --primary-foreground: 142 71% 97%; /* sage-50 */
     
-    --secondary: 20 14.3% 15.1%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 240 5% 96%;        /* stone-100 */
+    --secondary-foreground: 20 14.3% 9.5%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --muted: 20 5.9% 55.1%;
-    --muted-foreground: 20 5.9% 55.1%;
+    --muted: 240 5% 90%;          /* stone-200 */
+    --muted-foreground: 20 6% 40%;  /* stone-600 */
     
-    --accent: 158 83% 44%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 240 5% 96%;           /* stone-100 */
+    --accent-foreground: 20 14.3% 9.5%;
     
-    --border: 0 0% 89.8%;          /* stone-200 */
-    --input: 0 0% 89.8%;
-    --ring: 158 83% 34%;
+    --border: 240 6% 89%;          /* stone-200 */
+    --input: 240 6% 89%;
+    --ring: 142 71% 40%;
     
     --radius: 0.5rem;
   }
 
   [data-theme='night'] {
-    /* Night Theme - Graphite Dark - HSL Values */
-    --background: 20 14.3% 3.5%;  /* stone-950 */
-    --foreground: 0 0% 89.8%;      /* stone-200 */
+    /* Night Theme - "Graphite & Sage" Dark */
+    --background: 20 14.3% 4.5%;   /* stone-950 */
+    --foreground: 0 0% 90.2%;      /* stone-200 */
     
-    --card: 20 14.3% 3.5%;
-    --card-foreground: 0 0% 89.8%;
+    --card: 20 14.3% 4.5%;
+    --card-foreground: 0 0% 90.2%;
     
-    --primary: 158 83% 44%;      /* sage-500 */
-    --primary-foreground: 158 83% 97.1%;
+    --primary: 142 71% 40%;        /* sage-600 */
+    --primary-foreground: 142 71% 97%;
     
-    --secondary: 0 0% 89.8%;
-    --secondary-foreground: 20 14.3% 3.5%;
+    --secondary: 20 14.3% 9.5%;      /* stone-900 */
+    --secondary-foreground: 0 0% 90.2%;
 
-    --destructive: 0 72.2% 50.6%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --muted: 0 0% 63.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted: 20 14.3% 15.1%;        /* stone-800 */
+    --muted-foreground: 0 0% 63.9%;  /* stone-400 */
     
-    --accent: 158 83% 44%;
+    --accent: 20 14.3% 9.5%;         /* stone-900 */
     --accent-foreground: 0 0% 98%;
 
     --border: 20 14.3% 15.1%;      /* stone-800 */
     --input: 20 14.3% 15.1%;
-    --ring: 158 83% 44%;
+    --ring: 142 71% 40%;
   }
 }
 
@@ -78,7 +78,7 @@
 /* Centralized Form Input Styles */
 @layer components {
   .input-style {
-    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .error-text {

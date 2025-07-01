@@ -1,0 +1,76 @@
+$ pnpm dev
+
+> the-scent@0.1.0 dev /cdrom/project/Scent-Beautiful-Website
+> next dev
+
+  ▲ Next.js 14.2.30
+  - Local:        http://localhost:3000
+  - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 2.1s
+ ○ Compiling / ...
+ ✓ Compiled / in 15.2s (2679 modules)
+prisma:info Starting a postgresql pool with 9 connections.
+prisma:query SELECT "public"."Product"."id", "public"."Product"."sku", "public"."Product"."name", "public"."Product"."slug", "public"."Product"."description", "public"."Product"."shortDescription", "public"."Product"."price", "public"."Product"."isActive", "public"."Product"."isFeatured", "public"."Product"."scentNotes", "public"."Product"."ingredients", "public"."Product"."usageInstructions", "public"."Product"."modelUrl", "public"."Product"."createdAt", "public"."Product"."updatedAt", "public"."Product"."categoryId", "public"."Product"."brandId" FROM "public"."Product" WHERE ("public"."Product"."isActive" = $1 AND "public"."Product"."isFeatured" = $2) ORDER BY "public"."Product"."createdAt" DESC LIMIT $3 OFFSET $4
+prisma:query SELECT "public"."Category"."id", "public"."Category"."name", "public"."Category"."slug" FROM "public"."Category" WHERE "public"."Category"."id" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."ProductVariant"."id", "public"."ProductVariant"."sku", "public"."ProductVariant"."name", "public"."ProductVariant"."price", "public"."ProductVariant"."inventoryQuantity", "public"."ProductVariant"."createdAt", "public"."ProductVariant"."updatedAt", "public"."ProductVariant"."productId" FROM "public"."ProductVariant" WHERE "public"."ProductVariant"."productId" IN ($1,$2,$3,$4) ORDER BY "public"."ProductVariant"."price" ASC OFFSET $5
+prisma:query SELECT "public"."ProductImage"."id", "public"."ProductImage"."url", "public"."ProductImage"."altText", "public"."ProductImage"."position", "public"."ProductImage"."isPrimary", "public"."ProductImage"."createdAt", "public"."ProductImage"."productId" FROM "public"."ProductImage" WHERE ("public"."ProductImage"."isPrimary" = $1 AND "public"."ProductImage"."productId" IN ($2,$3,$4,$5)) ORDER BY "public"."ProductImage"."id" ASC OFFSET $6
+ GET / 200 in 16490ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 7.7s (1692 modules)
+ ✓ Compiled (1694 modules)
+ GET /favicon.ico 200 in 8311ms
+ GET /api/auth/session 200 in 8689ms
+ GET /api/auth/session 200 in 51ms
+ ○ Compiling /products ...
+ ✓ Compiled /products in 1518ms (2723 modules)
+prisma:query SELECT 1
+prisma:query SELECT "public"."Product"."id", "public"."Product"."sku", "public"."Product"."name", "public"."Product"."slug", "public"."Product"."description", "public"."Product"."shortDescription", "public"."Product"."price", "public"."Product"."isActive", "public"."Product"."isFeatured", "public"."Product"."scentNotes", "public"."Product"."ingredients", "public"."Product"."usageInstructions", "public"."Product"."modelUrl", "public"."Product"."createdAt", "public"."Product"."updatedAt", "public"."Product"."categoryId", "public"."Product"."brandId" FROM "public"."Product" WHERE "public"."Product"."isActive" = $1 ORDER BY "public"."Product"."createdAt" DESC LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Category"."id", "public"."Category"."name", "public"."Category"."slug" FROM "public"."Category" WHERE "public"."Category"."id" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."ProductVariant"."id", "public"."ProductVariant"."sku", "public"."ProductVariant"."name", "public"."ProductVariant"."price", "public"."ProductVariant"."inventoryQuantity", "public"."ProductVariant"."createdAt", "public"."ProductVariant"."updatedAt", "public"."ProductVariant"."productId" FROM "public"."ProductVariant" WHERE "public"."ProductVariant"."productId" IN ($1,$2,$3,$4,$5,$6) ORDER BY "public"."ProductVariant"."price" ASC OFFSET $7
+prisma:query SELECT "public"."ProductImage"."id", "public"."ProductImage"."url", "public"."ProductImage"."altText", "public"."ProductImage"."position", "public"."ProductImage"."isPrimary", "public"."ProductImage"."createdAt", "public"."ProductImage"."productId" FROM "public"."ProductImage" WHERE ("public"."ProductImage"."isPrimary" = $1 AND "public"."ProductImage"."productId" IN ($2,$3,$4,$5,$6,$7)) ORDER BY "public"."ProductImage"."id" ASC OFFSET $8
+ GET /products?_rsc=1bcmd 200 in 168ms
+ GET /favicon.ico 200 in 32ms
+ ○ Compiling /api/trpc/[trpc] ...
+ ✓ Compiled /api/trpc/[trpc] in 715ms (1721 modules)
+prisma:query SELECT "public"."Category"."id", "public"."Category"."name", "public"."Category"."slug", "public"."Category"."description", "public"."Category"."imageUrl", "public"."Category"."isActive", "public"."Category"."createdAt", "public"."Category"."updatedAt" FROM "public"."Category" WHERE "public"."Category"."isActive" = $1 ORDER BY "public"."Category"."name" ASC OFFSET $2
+ GET /api/trpc/product.getCategoryList?batch=1&input=%7B%220%22%3A%7B%22json%22%3Anull%2C%22meta%22%3A%7B%22values%22%3A%5B%22undefined%22%5D%7D%7D%7D 200 in 1620ms
+ ○ Compiling /login ...
+ ✓ Compiled /login in 2.5s (2762 modules)
+ GET /favicon.ico 200 in 23ms
+ ○ Compiling /cart ...
+ ✓ Compiled /cart in 752ms (2776 modules)
+ GET /favicon.ico 200 in 24ms
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 689ms (174 modules)
+ GET /favicon.ico 200 in 11ms
+ GET /api/auth/providers 200 in 51ms
+ GET /api/auth/csrf 200 in 16ms
+prisma:query SELECT 1
+prisma:query SELECT "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."emailVerified", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."firstName", "public"."User"."lastName", "public"."User"."avatarUrl", "public"."User"."stripeCustomerId", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ POST /api/auth/callback/credentials 401 in 27ms
+prisma:query SELECT 1
+prisma:query SELECT "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."emailVerified", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."firstName", "public"."User"."lastName", "public"."User"."avatarUrl", "public"."User"."stripeCustomerId", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query INSERT INTO "public"."User" ("id","email","passwordHash","role","firstName","lastName","createdAt","updatedAt") VALUES ($1,$2,$3,CAST($4::text AS "public"."UserRole"),$5,$6,$7,$8) RETURNING "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."emailVerified", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."firstName", "public"."User"."lastName", "public"."User"."avatarUrl", "public"."User"."stripeCustomerId", "public"."User"."createdAt", "public"."User"."updatedAt"
+ POST /api/trpc/user.register?batch=1 200 in 639ms
+ GET /api/auth/providers 200 in 44ms
+ GET /api/auth/csrf 200 in 27ms
+prisma:query SELECT "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."emailVerified", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."firstName", "public"."User"."lastName", "public"."User"."avatarUrl", "public"."User"."stripeCustomerId", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."email" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ POST /api/auth/callback/credentials 200 in 462ms
+ GET /api/auth/session 200 in 21ms
+ ○ Compiling /account/dashboard ...
+ ✓ Compiled /account/dashboard in 1136ms (2798 modules)
+prisma:query SELECT "public"."Order"."id", "public"."Order"."orderNumber", "public"."Order"."status"::text, "public"."Order"."total", "public"."Order"."notes", "public"."Order"."createdAt", "public"."Order"."updatedAt", "public"."Order"."userId", "public"."Order"."shippingAddress", "public"."Order"."billingAddress", "public"."Order"."stripePaymentIntentId", "public"."Order"."paymentStatus" FROM "public"."Order" WHERE "public"."Order"."userId" = $1 ORDER BY "public"."Order"."createdAt" DESC LIMIT $2 OFFSET $3
+prisma:query SELECT COUNT(*) AS "_count._all" FROM (SELECT "public"."Order"."id" FROM "public"."Order" WHERE "public"."Order"."userId" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Product"."id", "public"."Product"."sku", "public"."Product"."name", "public"."Product"."slug", "public"."Product"."description", "public"."Product"."shortDescription", "public"."Product"."price", "public"."Product"."isActive", "public"."Product"."isFeatured", "public"."Product"."scentNotes", "public"."Product"."ingredients", "public"."Product"."usageInstructions", "public"."Product"."modelUrl", "public"."Product"."createdAt", "public"."Product"."updatedAt", "public"."Product"."categoryId", "public"."Product"."brandId" FROM "public"."Product" WHERE ("public"."Product"."isFeatured" = $1 AND "public"."Product"."isActive" = $2) ORDER BY "public"."Product"."id" ASC LIMIT $3 OFFSET $4
+prisma:query SELECT "public"."ProductImage"."id", "public"."ProductImage"."url", "public"."ProductImage"."altText", "public"."ProductImage"."position", "public"."ProductImage"."isPrimary", "public"."ProductImage"."createdAt", "public"."ProductImage"."productId" FROM "public"."ProductImage" WHERE ("public"."ProductImage"."isPrimary" = $1 AND "public"."ProductImage"."productId" IN ($2,$3)) ORDER BY "public"."ProductImage"."id" ASC OFFSET $4
+ GET /account/dashboard?_rsc=su7u4 200 in 253ms
+ GET /favicon.ico 200 in 27ms
+ GET /favicon.ico 200 in 12ms
+ ○ Compiling /checkout ...
+ ✓ Compiled /checkout in 1120ms (2824 modules)
+ GET /favicon.ico 200 in 20ms
+prisma:query SELECT "public"."ProductVariant"."id", "public"."ProductVariant"."price" FROM "public"."ProductVariant" WHERE "public"."ProductVariant"."id" IN ($1,$2) OFFSET $3
+ POST /api/trpc/checkout.createPaymentIntent?batch=1 200 in 593ms
+
