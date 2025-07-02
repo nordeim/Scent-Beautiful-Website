@@ -3,63 +3,60 @@
 
 import React, { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useStripe } from '@stripe/react-stripe-js'
 import { useCart } from '@/hooks/use-cart'
 import { useCheckoutStore } from '@/store/checkout.store'
 import Link from 'next/link'
 import { Button } from '@/components/common/Button'
-import { CheckCircle, Loader2 } from 'lucide-react'
+import { CheckCircle, Loader2, AlertTriangle } from 'lucide-react'
+import { api } from '@/lib/api/trpc'
 
-// The actual logic needs to be in a child component to be wrapped in Suspense
 function OrderConfirmationStatus() {
-  const stripe = useStripe()
   const searchParams = useSearchParams()
   const { clearCart } = useCart()
   const { clearCheckoutState } = useCheckoutStore()
   
-  const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading')
-  const [message, setMessage] = useState('Verifying your payment details...')
+  const paymentIntentId = searchParams.get('payment_intent')
+  const clientSecret = searchParams.get('payment_intent_client_secret')
 
-  useEffect(() => {
-    const clientSecret = searchParams.get('payment_intent_client_secret')
-    if (!clientSecret || !stripe) {
-      setStatus('failed')
-      setMessage('Could not find payment details. Please contact support.')
-      return
+  // We use our new tRPC query to securely fetch the payment status
+  const { data, isLoading, isError } = api.order.getPaymentStatus.useQuery(
+    { paymentIntentId: paymentIntentId! },
+    {
+      enabled: !!paymentIntentId, // Only run the query if the paymentIntentId exists
+      retry: 3,
+      retryDelay: 1000,
     }
+  );
 
-    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-      switch (paymentIntent?.status) {
-        case 'succeeded':
-          setStatus('success')
-          setMessage('Your payment was successful.')
-          // Clear both cart and checkout state on success
-          clearCart()
-          clearCheckoutState()
-          break
-        case 'processing':
-          setStatus('loading')
-          setMessage('Your payment is processing. We will notify you upon confirmation.')
-          break
-        default:
-          setStatus('failed')
-          setMessage('Payment failed. Please try again or contact support.')
-          break
-      }
-    })
-  }, [stripe, searchParams, clearCart, clearCheckoutState])
+  // Clear state only once when payment succeeds
+  useEffect(() => {
+    if (data?.status === 'succeeded') {
+      clearCart();
+      clearCheckoutState();
+    }
+  }, [data?.status, clearCart, clearCheckoutState]);
 
-  if (status === 'loading') {
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center">
         <Loader2 className="h-16 w-16 text-primary animate-spin mb-4" />
-        <h1 className="text-3xl font-bold mb-2">Processing Order</h1>
-        <p className="text-muted-foreground mb-6">{message}</p>
+        <h1 className="text-3xl font-bold mb-2">Verifying Payment...</h1>
+        <p className="text-muted-foreground">Please wait while we confirm your transaction.</p>
       </div>
-    )
+    );
   }
   
-  if (status === 'success') {
+  if (isError || !clientSecret) {
+     return (
+        <div className="flex flex-col items-center">
+            <AlertTriangle className="h-16 w-16 text-destructive mb-4" />
+            <h1 className="text-3xl font-bold text-destructive mb-2">Verification Failed</h1>
+            <p className="text-muted-foreground mb-6">Could not verify payment details. Please contact support.</p>
+        </div>
+     )
+  }
+
+  if (data?.status === 'succeeded') {
     return (
       <div className="flex flex-col items-center">
         <CheckCircle className="h-16 w-16 text-primary mb-4" />
@@ -72,24 +69,24 @@ function OrderConfirmationStatus() {
     )
   }
 
-  // status === 'failed'
+  // Handle other statuses like 'processing' or 'failed'
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-3xl font-bold text-destructive mb-2">Payment Failed</h1>
-      <p className="text-muted-foreground mb-6">{message}</p>
+      <AlertTriangle className="h-16 w-16 text-amber-500 mb-4" />
+      <h1 className="text-3xl font-bold text-amber-600 mb-2">Payment Incomplete</h1>
+      <p className="text-muted-foreground mb-6">Your payment has not been confirmed. Please check with your payment provider or try again.</p>
       <Button asChild>
-        <Link href="/checkout/information">Try Again</Link>
+        <Link href="/checkout/information">Return to Checkout</Link>
       </Button>
     </div>
   )
 }
 
-
 export default function OrderConfirmationPage() {
   return (
     <div className="container my-16 text-center">
       <div className="max-w-2xl mx-auto border rounded-lg p-8">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div className="h-48 flex justify-center items-center"><Loader2 className="h-16 w-16 text-primary animate-spin" /></div>}>
           <OrderConfirmationStatus />
         </Suspense>
       </div>
