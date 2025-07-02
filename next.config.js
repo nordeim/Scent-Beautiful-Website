@@ -19,6 +19,16 @@ const nextConfig = {
       },
     ],
   },
+  // Add a redirect for the base checkout path to the first step
+  async redirects() {
+    return [
+      {
+        source: '/checkout',
+        destination: '/checkout/information',
+        permanent: false, // This is part of a user flow, not a permanent SEO redirect
+      },
+    ]
+  },
 };
 
 module.exports = withBundleAnalyzer(nextConfig)

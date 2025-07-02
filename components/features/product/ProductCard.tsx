@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { useCart } from '@/hooks/use-cart'
 import type { ProductCardType } from '@/types'
 import { formatPrice } from '@/lib/utils/formatters'
+import { toast } from 'react-hot-toast'
 
 interface ProductCardProps {
   product: ProductCardType
@@ -24,19 +25,17 @@ export function ProductCard({
   aspectRatio = 'aspect-[4/5]',
   priority = false,
 }: ProductCardProps) {
-  // Destructure setDrawerOpen from the useCart hook
   const { addItem, setDrawerOpen } = useCart()
   const primaryImage = product.images?.[0]
   const primaryVariant = product.variants?.[0]
   const displayPrice = primaryVariant?.price ?? product.price
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // CRITICAL FIX: Ensure event propagation is stopped to prevent the parent Link from firing.
     e.preventDefault()
     e.stopPropagation()
 
     if (!primaryVariant) {
-      console.error('No variant found for product:', product.name)
+      toast.error('This product has no variants available.')
       return
     }
 
@@ -58,7 +57,7 @@ export function ProductCard({
       },
     })
     
-    // ENHANCEMENT: Open the cart drawer for immediate user feedback.
+    toast.success(`${product.name} added to cart!`)
     setDrawerOpen(true)
   }
 
@@ -87,7 +86,6 @@ export function ProductCard({
             <p className="mt-2 text-xl font-semibold">{formatPrice(displayPrice, { notation: 'standard' })}</p>
           </CardContent>
           <CardFooter className="p-4 pt-0">
-            {/* The onClick handler is correctly passed here */}
             <Button variant="secondary" className="w-full" onClick={handleAddToCart}>
               Add to Cart
             </Button>

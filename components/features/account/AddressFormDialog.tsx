@@ -18,6 +18,7 @@ import {
 } from '@/components/common/Dialog'
 import type { Address } from '@prisma/client'
 import { useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 interface AddressFormDialogProps {
   initialData?: Address | null
@@ -40,24 +41,25 @@ export function AddressFormDialog({ initialData, trigger, onSuccess }: AddressFo
       firstName: '',
       lastName: '',
       addressLine1: '',
-      addressLine2: '', // Add addressLine2 to default values
+      addressLine2: '',
       city: '',
       stateProvince: '',
       postalCode: '',
-      countryCode: 'SG', // Set default country to Singapore
+      countryCode: 'SG',
     },
   })
 
   const upsertAddress = api.address.upsert.useMutation({
     onSuccess: () => {
-      utils.address.list.invalidate() // Refetch the address list
-      setIsOpen(false) // Close the dialog
-      reset() // Reset form state
+      utils.address.list.invalidate()
+      toast.success(initialData ? 'Address updated!' : 'Address added!')
+      setIsOpen(false)
+      reset()
       onSuccess?.()
     },
     onError: (error) => {
-      // In a real app, you might set a form error here
       console.error('Failed to save address:', error)
+      toast.error('Failed to save address. Please try again.')
     },
   })
 
@@ -93,7 +95,6 @@ export function AddressFormDialog({ initialData, trigger, onSuccess }: AddressFo
             <Input id="addressLine1" {...register('addressLine1')} />
             {errors.addressLine1 && <p className="error-text">{errors.addressLine1.message}</p>}
           </div>
-          {/* New field for Address Line 2 */}
           <div className="space-y-1">
             <label htmlFor="addressLine2">Address Line 2 (Optional)</label>
             <Input id="addressLine2" {...register('addressLine2')} />
@@ -116,7 +117,6 @@ export function AddressFormDialog({ initialData, trigger, onSuccess }: AddressFo
               {errors.postalCode && <p className="error-text">{errors.postalCode.message}</p>}
             </div>
           </div>
-          {/* New field for Country */}
           <div className="space-y-1">
             <label htmlFor="countryCode">Country</label>
             <Input id="countryCode" {...register('countryCode')} />

@@ -20,5 +20,6 @@ export default withAuth(
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/account/:path*', '/checkout'], // Protect account and checkout pages
+  // CORRECTED: Use a path matcher to protect the entire checkout flow, not just the base URL.
+  matcher: ['/account/:path*', '/checkout/:path*'],
 }

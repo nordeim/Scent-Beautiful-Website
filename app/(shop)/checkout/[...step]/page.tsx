@@ -1,9 +1,12 @@
-// app/(shop)/checkout/page.tsx
+// app/(shop)/checkout/[...step]/page.tsx
 'use client'
 
 import { useCart } from '@/hooks/use-cart'
 import { formatPrice } from '@/lib/utils/formatters'
-import { CheckoutForm } from '@/components/features/checkout/CheckoutForm'
+import { useCheckoutStore } from '@/store/checkout.store'
+import { InformationStep } from '@/components/features/checkout/InformationStep'
+import { PaymentStep } from '@/components/features/checkout/PaymentStep'
+
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { useEffect, useState } from 'react'
@@ -13,28 +16,31 @@ import { useSession } from 'next-auth/react'
 import { AlertTriangle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import Link from 'next/link'
+import { useParams, useRouter } from 'next/navigation'
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
   : null
 
 interface PriceDetails {
-  subtotal: number;
-  taxAmount: number;
-  total: number;
+  subtotal: number
+  taxAmount: number
+  total: number
 }
 
-export default function CheckoutPage() {
+export default function CheckoutStepsPage() {
+  const params = useParams()
+  const router = useRouter()
   const { data: session } = useSession()
-  const { items, getTotalPrice } = useCart() // getTotalPrice is now a fallback
+  const { items } = useCart()
+  // Only get shippingAddress from the store. The cleanup function is removed from here.
+  const { shippingAddress } = useCheckoutStore()
+
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [priceDetails, setPriceDetails] = useState<PriceDetails | null>(null)
 
-  // Fetch user's addresses to pre-fill the form
-  const { data: addresses, isLoading: isLoadingAddresses } = api.address.list.useQuery(undefined, {
-    enabled: !!session, // Only run query if user is logged in
-  });
-  
+  const step = Array.isArray(params.step) ? params.step[0] : 'information'
+
   const {
     mutate: createPaymentIntent,
     isPending,
@@ -54,64 +60,89 @@ export default function CheckoutPage() {
   })
 
   useEffect(() => {
-    if (items.length > 0) {
+    // Create a payment intent only when we are on the payment step AND all necessary data is available.
+    if (step === 'payment' && shippingAddress && items.length > 0 && !clientSecret) {
       createPaymentIntent({
-        cartItems: items.map((item) => ({
-          id: item.id,
-          quantity: item.quantity,
-        })),
+        cartItems: items.map((item) => ({ id: item.id, quantity: item.quantity })),
         userId: session?.user?.id,
       })
     }
-  }, [items, session, createPaymentIntent])
+  }, [step, shippingAddress, items, clientSecret, session, createPaymentIntent]);
 
   if (!stripePromise) {
     return (
       <div className="container my-12 text-center">
         <h1 className="text-2xl font-bold text-destructive">Configuration Error</h1>
-        <p className="text-muted-foreground mt-2">
-          The payment gateway is not configured correctly. Please contact support.
-        </p>
+        <p className="text-muted-foreground mt-2">The gateway is not configured.</p>
       </div>
     )
   }
 
-  const defaultAddress = addresses?.find(addr => addr.isDefault) || addresses?.[0];
-  const subtotal = priceDetails ? priceDetails.subtotal : getTotalPrice();
+  const subtotal = priceDetails ? priceDetails.subtotal : items.reduce((acc, item) => acc + Number(item.variant.price) * item.quantity, 0)
   const appearance = { theme: 'stripe' as const }
   const options = clientSecret ? { clientSecret, appearance } : undefined
+
+  const renderStep = () => {
+    if (step === 'information') {
+      return <InformationStep />
+    }
+    
+    if (step === 'payment') {
+      // If a user somehow lands here without an address (e.g., direct navigation),
+      // show a helpful message. This check now works reliably.
+      if (!shippingAddress) {
+        return (
+          <div className="text-center p-8 border rounded-lg flex flex-col items-center">
+            <AlertTriangle className="h-8 w-8 text-amber-500 mb-4" />
+            <p className="font-semibold">Missing Shipping Information</p>
+            <p className="text-sm text-muted-foreground mb-6">Please provide your shipping address first.</p>
+            <Button asChild>
+              <Link href="/checkout/information">Go to Information Step</Link>
+            </Button>
+          </div>
+        )
+      }
+
+      if (isPending) {
+        return (
+          <div className="text-center p-8 border rounded-lg flex flex-col items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground">Preparing secure payment...</p>
+          </div>
+        )
+      }
+
+      if (isPaymentIntentError) {
+        return (
+          <div className="text-center p-8 border rounded-lg border-destructive/50 bg-destructive/10 text-destructive flex flex-col items-center">
+            <AlertTriangle className="h-8 w-8 mb-4" />
+            <p className="font-semibold">Could not initiate payment.</p>
+            <Button onClick={() => router.back()} variant="destructive">Go Back</Button>
+          </div>
+        )
+      }
+
+      if (options && shippingAddress) {
+        return (
+          <Elements options={options} stripe={stripePromise}>
+            <PaymentStep shippingAddress={shippingAddress} />
+          </Elements>
+        )
+      }
+    }
+    
+    // Fallback for invalid steps or loading state
+    return (
+        <div className="text-center p-8 border rounded-lg flex flex-col items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+        </div>
+    );
+  }
 
   return (
     <div className="container my-12">
       <div className="grid grid-cols-1 gap-x-12 lg:grid-cols-2">
-        <div className="py-8">
-          <h1 className="text-3xl font-bold mb-6">Checkout</h1>
-          
-          {(isPending || isLoadingAddresses) && (
-            <div className="text-center p-8 border rounded-lg flex flex-col items-center justify-center h-64">
-              <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-              <p className="text-muted-foreground">Preparing your secure payment session...</p>
-            </div>
-          )}
-
-          {isPaymentIntentError && !isPending && (
-            <div className="text-center p-8 border rounded-lg border-destructive/50 bg-destructive/10 text-destructive flex flex-col items-center">
-              <AlertTriangle className="h-8 w-8 mb-4" />
-              <p className="font-semibold">Could not initiate payment.</p>
-              <p className="text-sm text-destructive/80 mb-6">There was an issue connecting to our payment provider.</p>
-              <Button asChild variant="destructive">
-                <Link href="/cart">Return to Cart</Link>
-              </Button>
-            </div>
-          )}
-
-          {options && !isPending && !isPaymentIntentError && (
-            <Elements options={options} stripe={stripePromise}>
-              <CheckoutForm initialData={defaultAddress} />
-            </Elements>
-          )}
-        </div>
-
+        <div className="py-8">{renderStep()}</div>
         <aside className="bg-stone-100 dark:bg-stone-900/50 p-8 rounded-lg lg:py-8 order-first lg:order-last">
           <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
           <div className="space-y-4">

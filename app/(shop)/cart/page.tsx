@@ -2,16 +2,30 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { useCart } from '@/hooks/use-cart'
 import { Button } from '@/components/common/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/common/Card'
 import { CartItem } from '@/components/features/cart/CartItem'
 import { formatPrice } from '@/lib/utils/formatters'
+import { Loader2 } from 'lucide-react'
 
 export default function CartPage() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
   const { items, getTotalPrice, getTotalItems } = useCart()
   const totalPrice = getTotalPrice()
   const totalItems = getTotalItems()
+
+  const handleCheckout = () => {
+    if (status === 'authenticated') {
+      router.push('/checkout/information')
+    } else {
+      // Redirect guest users to login, but tell the login page where to return to.
+      router.push('/login?callbackUrl=/checkout/information')
+    }
+  }
 
   return (
     <div className="container my-12">
@@ -47,9 +61,20 @@ export default function CartPage() {
                   <span>Total</span>
                   <span>{formatPrice(totalPrice)}</span>
                 </div>
-                <Button asChild size="lg" className="w-full mt-4">
-                  <Link href="/checkout">Proceed to Checkout</Link>
+                
+                <Button
+                  onClick={handleCheckout}
+                  disabled={status === 'loading'}
+                  size="lg"
+                  className="w-full mt-4"
+                >
+                  {status === 'loading' ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    'Proceed to Checkout'
+                  )}
                 </Button>
+
               </CardContent>
             </Card>
           </div>

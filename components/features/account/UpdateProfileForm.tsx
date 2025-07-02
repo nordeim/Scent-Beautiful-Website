@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/common/Input'
 import { Button } from '@/components/common/Button'
 import type { User } from '@prisma/client'
+import { toast } from 'react-hot-toast'
 
 interface UpdateProfileFormProps {
   user: Pick<User, 'firstName' | 'lastName'>
@@ -33,7 +34,8 @@ export function UpdateProfileForm({ user }: UpdateProfileFormProps) {
     onSuccess: () => {
       // Invalidate the 'me' query to refetch fresh data
       utils.user.me.invalidate()
-      // Ideally, show a success toast here
+      // Show a success toast
+      toast.success('Profile updated successfully!')
     },
     onError: (error) => {
       setError('root', { message: error.message || 'An unexpected error occurred.' })

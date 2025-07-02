@@ -8,10 +8,9 @@ import { api } from '@/lib/api/trpc'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/common/Card'
 import { Input } from '@/components/common/Input'
 import { Button } from '@/components/common/Button'
-import { useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 export function UpdatePasswordForm() {
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
@@ -24,7 +23,7 @@ export function UpdatePasswordForm() {
 
   const updatePassword = api.user.updatePassword.useMutation({
     onSuccess: (data) => {
-      setSuccessMessage(data.message)
+      toast.success(data.message)
       reset()
     },
     onError: (error) => {
@@ -33,7 +32,6 @@ export function UpdatePasswordForm() {
   })
 
   const onSubmit = (data: TPasswordChangeSchema) => {
-    setSuccessMessage(null) // Clear previous messages
     updatePassword.mutate(data)
   }
 
@@ -61,7 +59,6 @@ export function UpdatePasswordForm() {
             {errors.confirmPassword && <p className="error-text">{errors.confirmPassword.message}</p>}
           </div>
           {errors.root && <p className="error-text">{errors.root.message}</p>}
-          {successMessage && <p className="text-sm font-medium text-primary">{successMessage}</p>}
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Updating...' : 'Update Password'}
           </Button>
