@@ -7,9 +7,14 @@ import { shippingAddressSchema, TShippingAddressSchema } from '@/lib/validation/
 import { useStripe, PaymentElement, useElements } from '@stripe/react-stripe-js'
 import { useState } from 'react'
 import { Button } from '@/components/common/Button'
-import { Input } from '@/components/common/Input' // Import new component
+import { Input } from '@/components/common/Input'
+import type { Address } from '@prisma/client'
 
-export function CheckoutForm() {
+interface CheckoutFormProps {
+  initialData?: Partial<Address> | null
+}
+
+export function CheckoutForm({ initialData }: CheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -21,6 +26,17 @@ export function CheckoutForm() {
     formState: { errors },
   } = useForm<TShippingAddressSchema>({
     resolver: zodResolver(shippingAddressSchema),
+    // Pre-fill form with initialData if provided, otherwise use defaults
+    defaultValues: {
+      firstName: initialData?.firstName || '',
+      lastName: initialData?.lastName || '',
+      addressLine1: initialData?.addressLine1 || '',
+      addressLine2: initialData?.addressLine2 || '',
+      city: initialData?.city || '',
+      stateProvince: initialData?.stateProvince || '',
+      postalCode: initialData?.postalCode || '',
+      countryCode: initialData?.countryCode || 'SG',
+    },
   })
 
   const processSubmit = async (data: TShippingAddressSchema) => {
@@ -45,9 +61,9 @@ export function CheckoutForm() {
       },
     })
     
-    if (error.type === 'card_error' || error.type === 'validation_error') {
+    if (error && (error.type === 'card_error' || error.type === 'validation_error')) {
       setErrorMessage(error.message || 'An unexpected error occurred.')
-    } else {
+    } else if (error) {
       setErrorMessage('An unexpected error occurred.')
     }
 
@@ -95,7 +111,7 @@ export function CheckoutForm() {
             </div>
             <div>
                 <label htmlFor="countryCode">Country</label>
-                <Input type="text" id="countryCode" {...register('countryCode')} className="mt-1" defaultValue="US"/>
+                <Input type="text" id="countryCode" {...register('countryCode')} className="mt-1" />
                 {errors.countryCode && <p className="error-text">{errors.countryCode.message}</p>}
             </div>
         </div>

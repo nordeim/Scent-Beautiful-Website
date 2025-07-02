@@ -88,3 +88,12 @@ The important point is to proceed very carefully so as not to introduce any regr
 ---
 Please carefully review the "pnpm add" log and the application start up log below for any issue.
 
+---
+excellent results so far! please help me carefully review and validate the application start up log below. If no issue, please make the following improvement:
+
+1) when the use click on the  "Proceed to Checkout" button, the code should not immediately trigger the STRIPE initialization because we need the next page to appear which will let the use edit/choose the shipping address (default to the user default address) and present the GST rate calculation. That page will have "Pay" button to call Stripe for chosen payment option.
+
+Please put on your deep-thinking hat to deeply and systematically explore how best to re-imagine how the checkout flow can be improved to allow user to select the shipping address and method, then the total payable amount will be re-computed to also include the GST amount.
+
+Please consider the various options, then choose the best option matching how other similar websites will behave, then create a detailed execution plan with integrated checklist for this improvement. Let me study your execution plan before proceeding. Thank you and good luck!
+

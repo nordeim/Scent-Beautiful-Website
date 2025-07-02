@@ -14,16 +14,27 @@ import { AlertTriangle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import Link from 'next/link'
 
-// Read the public key once and validate it.
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
   : null
 
+interface PriceDetails {
+  subtotal: number;
+  taxAmount: number;
+  total: number;
+}
+
 export default function CheckoutPage() {
   const { data: session } = useSession()
-  const { items, getTotalPrice } = useCart()
+  const { items, getTotalPrice } = useCart() // getTotalPrice is now a fallback
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [priceDetails, setPriceDetails] = useState<PriceDetails | null>(null)
 
+  // Fetch user's addresses to pre-fill the form
+  const { data: addresses, isLoading: isLoadingAddresses } = api.address.list.useQuery(undefined, {
+    enabled: !!session, // Only run query if user is logged in
+  });
+  
   const {
     mutate: createPaymentIntent,
     isPending,
@@ -31,18 +42,20 @@ export default function CheckoutPage() {
   } = api.checkout.createPaymentIntent.useMutation({
     onSuccess: (data) => {
       setClientSecret(data.clientSecret)
+      setPriceDetails({
+        subtotal: data.subtotal,
+        taxAmount: data.taxAmount,
+        total: data.total,
+      })
     },
     onError: (error) => {
       console.error('Failed to create payment intent:', error)
-      // The state will reflect this error, and the UI will update.
     },
   })
 
   useEffect(() => {
-    // Only create an intent if there are items in the cart.
     if (items.length > 0) {
       createPaymentIntent({
-        // The API now expects a structured array, not a JSON string.
         cartItems: items.map((item) => ({
           id: item.id,
           quantity: item.quantity,
@@ -52,7 +65,6 @@ export default function CheckoutPage() {
     }
   }, [items, session, createPaymentIntent])
 
-  // 1. Render an error if the public key is missing in the environment.
   if (!stripePromise) {
     return (
       <div className="container my-12 text-center">
@@ -64,6 +76,8 @@ export default function CheckoutPage() {
     )
   }
 
+  const defaultAddress = addresses?.find(addr => addr.isDefault) || addresses?.[0];
+  const subtotal = priceDetails ? priceDetails.subtotal : getTotalPrice();
   const appearance = { theme: 'stripe' as const }
   const options = clientSecret ? { clientSecret, appearance } : undefined
 
@@ -73,15 +87,14 @@ export default function CheckoutPage() {
         <div className="py-8">
           <h1 className="text-3xl font-bold mb-6">Checkout</h1>
           
-          {/* 2. Handle the three possible states: loading, error, or success */}
-          {isPending && (
+          {(isPending || isLoadingAddresses) && (
             <div className="text-center p-8 border rounded-lg flex flex-col items-center justify-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
               <p className="text-muted-foreground">Preparing your secure payment session...</p>
             </div>
           )}
 
-          {isPaymentIntentError && (
+          {isPaymentIntentError && !isPending && (
             <div className="text-center p-8 border rounded-lg border-destructive/50 bg-destructive/10 text-destructive flex flex-col items-center">
               <AlertTriangle className="h-8 w-8 mb-4" />
               <p className="font-semibold">Could not initiate payment.</p>
@@ -94,7 +107,7 @@ export default function CheckoutPage() {
 
           {options && !isPending && !isPaymentIntentError && (
             <Elements options={options} stripe={stripePromise}>
-              <CheckoutForm />
+              <CheckoutForm initialData={defaultAddress} />
             </Elements>
           )}
         </div>
@@ -118,15 +131,21 @@ export default function CheckoutPage() {
           <div className="mt-8 pt-4 border-t space-y-2">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>{formatPrice(getTotalPrice())}</span>
+              <span>{formatPrice(subtotal)}</span>
             </div>
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Shipping</span>
               <span>Free</span>
             </div>
+            {priceDetails && (
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>GST (9%)</span>
+                <span>{formatPrice(priceDetails.taxAmount)}</span>
+              </div>
+            )}
             <div className="flex justify-between font-bold text-lg pt-2 border-t mt-2">
               <span>Total</span>
-              <span>{formatPrice(getTotalPrice())}</span>
+              <span>{formatPrice(priceDetails ? priceDetails.total : subtotal)}</span>
             </div>
           </div>
         </aside>

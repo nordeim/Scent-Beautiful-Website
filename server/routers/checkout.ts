@@ -4,12 +4,12 @@ import { router, publicProcedure } from '../trpc'
 import { stripe } from '@/lib/payments/stripe'
 import { TRPCError } from '@trpc/server'
 import { prisma } from '@/lib/db/client'
+import { GST_RATE } from '@/lib/config/shop' // Import the GST rate
 
 export const checkoutRouter = router({
   createPaymentIntent: publicProcedure
     .input(
       z.object({
-        // The input is now a structured array, providing better type safety.
         cartItems: z.array(
           z.object({
             id: z.string(),
@@ -19,18 +19,24 @@ export const checkoutRouter = router({
         userId: z.string().optional(),
       }),
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       try {
         const { cartItems, userId } = input
 
-        // Fetch product details from the database to ensure prices are accurate and not manipulated on the client.
+        if (cartItems.length === 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Cannot process an empty cart.',
+          })
+        }
+
         const variantIds = cartItems.map((item) => item.id)
         const variants = await prisma.productVariant.findMany({
           where: { id: { in: variantIds } },
           select: { id: true, price: true },
         })
 
-        const amount = cartItems.reduce((total, cartItem) => {
+        const subtotal = cartItems.reduce((total, cartItem) => {
           const variant = variants.find((v) => v.id === cartItem.id)
           if (!variant) {
             throw new TRPCError({
@@ -41,25 +47,26 @@ export const checkoutRouter = router({
           const priceInNumber = variant.price.toNumber()
           return total + priceInNumber * cartItem.quantity
         }, 0)
+        
+        // Server-side tax calculation
+        const taxAmount = subtotal * GST_RATE;
+        const totalAmount = subtotal + taxAmount;
 
-        // Prevent creating a payment intent for a zero-value cart
-        if (amount <= 0) {
+        if (totalAmount <= 0) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
-            message: 'Cannot process an empty or zero-value cart.',
+            message: 'Cannot process a zero-value cart.',
           })
         }
 
-        // The metadata needs to be a flat object of strings.
-        // We'll stringify the cart details for the webhook.
         const metadataForStripe = {
           cartDetails: JSON.stringify(cartItems),
           userId: userId || 'guest',
         }
 
         const paymentIntent = await stripe.paymentIntents.create({
-          amount: Math.round(amount * 100), // Stripe expects the amount in cents
-          currency: 'usd',
+          amount: Math.round(totalAmount * 100), // Use the final, taxed amount for Stripe
+          currency: 'sgd', // Update currency to Singapore Dollar
           automatic_payment_methods: {
             enabled: true,
           },
@@ -73,12 +80,15 @@ export const checkoutRouter = router({
           })
         }
 
+        // Return the full price breakdown to the client
         return {
           clientSecret: paymentIntent.client_secret,
+          subtotal: subtotal,
+          taxAmount: taxAmount,
+          total: totalAmount,
         }
       } catch (error) {
         console.error('Stripe Payment Intent Error:', error)
-        // Propagate specific TRPC errors or a generic one
         if (error instanceof TRPCError) throw error
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
