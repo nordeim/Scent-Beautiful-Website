@@ -5,7 +5,8 @@ import { api } from '@/lib/api/trpc'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/common/Card'
 import { Button } from '@/components/common/Button'
 import { Edit, Plus, Trash2 } from 'lucide-react'
-import { AddressFormDialog } from './AddressFormDialog' // Import the new dialog
+import { AddressFormDialog } from './AddressFormDialog'
+import { Badge } from '@/components/common/Badge'
 
 export function ManageAddresses() {
   const utils = api.useUtils()
@@ -30,7 +31,6 @@ export function ManageAddresses() {
           <CardTitle>Shipping Addresses</CardTitle>
           <CardDescription>Manage your saved addresses.</CardDescription>
         </div>
-        {/* "Add New" button now triggers the dialog in create mode */}
         <AddressFormDialog
           trigger={
             <Button size="sm">
@@ -47,13 +47,16 @@ export function ManageAddresses() {
               <div className="flex-grow">
                 <p className="font-semibold">{address.firstName} {address.lastName}</p>
                 <p className="text-sm text-muted-foreground">{address.addressLine1}</p>
+                {/* Conditionally render Address Line 2 */}
                 {address.addressLine2 && <p className="text-sm text-muted-foreground">{address.addressLine2}</p>}
-                <p className="text-sm text-muted-foreground">{address.city}, {address.stateProvince} {address.postalCode}</p>
+                {/* Display city, state, postal code, and country */}
+                <p className="text-sm text-muted-foreground">
+                  {address.city}, {address.stateProvince} {address.postalCode}, {address.countryCode}
+                </p>
               </div>
               <div className="flex-shrink-0 flex flex-col items-end gap-2">
                 {address.isDefault && <Badge variant="secondary">Default</Badge>}
                 <div className="flex gap-1">
-                  {/* "Edit" button now triggers the dialog in edit mode */}
                   <AddressFormDialog
                     initialData={address}
                     trigger={

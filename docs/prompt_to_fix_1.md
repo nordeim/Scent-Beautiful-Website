@@ -85,3 +85,6 @@ You really need to be thorough in your analysis to avoid going into endless loop
 
 The important point is to proceed very carefully so as not to introduce any regression error or accidentally omit the original features or functions. use the same tested rigorous and meticulous approach. thank you and good luck!
 
+---
+Please carefully review the "pnpm add" log and the application start up log below for any issue.
+

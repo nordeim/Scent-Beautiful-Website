@@ -6,6 +6,7 @@ import { Header } from '@/components/common/Layout/Header'
 import { Footer } from '@/components/common/Layout/Footer'
 import { cn } from '@/lib/utils'
 import { Providers } from '@/components/providers/Providers'
+import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -48,6 +49,33 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          {/* Global Toaster for notifications, themed to match the app */}
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              // Base styles for all toasts
+              style: {
+                borderRadius: 'var(--radius)',
+                background: 'hsl(var(--background))',
+                color: 'hsl(var(--foreground))',
+                border: '1px solid hsl(var(--border))',
+              },
+              // Specific styles for success toasts
+              success: {
+                iconTheme: {
+                  primary: 'hsl(var(--primary))',
+                  secondary: 'hsl(var(--primary-foreground))',
+                },
+              },
+              // Specific styles for error toasts
+              error: {
+                iconTheme: {
+                  primary: 'hsl(var(--destructive))',
+                  secondary: 'hsl(var(--destructive-foreground))',
+                },
+              },
+            }}
+          />
         </Providers>
       </body>
     </html>

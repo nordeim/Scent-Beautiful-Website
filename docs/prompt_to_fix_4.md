@@ -136,3 +136,6 @@ with the new insights and lessons learned, please help me to create a *complete*
 ---
 awesome job! now help me to carefully create a *complete* updated *replacement* file for `pyproject.toml` with the versions of the python packages changed to use the versions currently installed as shown below.
 
+---
+Awesome job! please help me carefully review and validate the application start up log shared below. If there is no issue, please help me carefully, systematically and meticulously explore for the best implementation option to implement the following improvements. Put on your deep-thinking hat to carefully and thoroughly explore various implementation options for each improvement item, deliberate and evaluate the possible implementation options before choosing the best implementation option for each improvement item. Please come up with a detailed execution plan to implement the chosen options in logical phases and steps, and for each step of, list out the files to be modified or added, and for each of these files, list what changes are needed and add an associated checklist for validating the changes when each file is generated. Please share the detailed execution plan with integrated checklist with me for approval before executing.
+

@@ -40,10 +40,11 @@ export function AddressFormDialog({ initialData, trigger, onSuccess }: AddressFo
       firstName: '',
       lastName: '',
       addressLine1: '',
+      addressLine2: '', // Add addressLine2 to default values
       city: '',
       stateProvince: '',
       postalCode: '',
-      countryCode: 'US',
+      countryCode: 'SG', // Set default country to Singapore
     },
   })
 
@@ -92,6 +93,12 @@ export function AddressFormDialog({ initialData, trigger, onSuccess }: AddressFo
             <Input id="addressLine1" {...register('addressLine1')} />
             {errors.addressLine1 && <p className="error-text">{errors.addressLine1.message}</p>}
           </div>
+          {/* New field for Address Line 2 */}
+          <div className="space-y-1">
+            <label htmlFor="addressLine2">Address Line 2 (Optional)</label>
+            <Input id="addressLine2" {...register('addressLine2')} />
+            {errors.addressLine2 && <p className="error-text">{errors.addressLine2.message}</p>}
+          </div>
           <div className="space-y-1">
             <label htmlFor="city">City</label>
             <Input id="city" {...register('city')} />
@@ -108,6 +115,12 @@ export function AddressFormDialog({ initialData, trigger, onSuccess }: AddressFo
               <Input id="postalCode" {...register('postalCode')} />
               {errors.postalCode && <p className="error-text">{errors.postalCode.message}</p>}
             </div>
+          </div>
+          {/* New field for Country */}
+          <div className="space-y-1">
+            <label htmlFor="countryCode">Country</label>
+            <Input id="countryCode" {...register('countryCode')} />
+            {errors.countryCode && <p className="error-text">{errors.countryCode.message}</p>}
           </div>
           <DialogFooter>
             <DialogClose asChild>
